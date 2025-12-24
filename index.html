@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TravelPlan Pro - Travel Itinerary Manager</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TravelPlan">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234F46E5' width='100' height='100' rx='20'/><text x='50' y='65' text-anchor='middle' fill='white' font-size='50'>✈️</text></svg>">
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVHJhdmVsUGxhbiBQcm8iLCJzaG9ydF9uYW1lIjoiVHJhdmVsUGxhbiIsImRlc2NyaXB0aW9uIjoiUGVyc29uYWwgVHJhdmVsIEl0aW5lcmFyeSBNYW5hZ2VyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiM0RjQ2RTUiLCJ0aGVtZV9jb2xvciI6IiM0RjQ2RTUiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PHJlY3QgZmlsbD0nJTIzNEY0NkU1JyB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgcng9JzIwJy8+PHRleHQgeD0nNTAnIHk9JzY1JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPSd3aGl0ZScgZm9udC1zaXplPSc1MCc+4pyIPC90ZXh0Pjwvc3ZnPiIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #7C3AED;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 280px;
+            --header-height: 64px;
+            --bottom-nav-height: 70px;
+        }
+
+        .dark {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --border-color: #475569;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dark body {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: linear-gradient(180deg, #4F46E5 0%, #7C3AED 100%);
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark .sidebar {
+            background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 24px;
+            color: rgba(255, 255, 255, 0.75);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+        }
+
+        .nav-item i {
+            width: 22px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            z-index: 90;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .mobile-header {
+            background: #1E293B;
+        }
+
+        /* Bottom Navigation (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--bottom-nav-height);
+            background: white;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 90;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .dark .bottom-nav {
+            background: #1E293B;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .bottom-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            color: #64748B;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 12px;
+        }
+
+        .bottom-nav-item i {
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        .bottom-nav-item.active i {
+            transform: scale(1.15);
+        }
+
+        .dark .bottom-nav-item {
+            color: #94A3B8;
+        }
+
+        .dark .bottom-nav-item.active {
+            color: #818CF8;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 95;
+                backdrop-filter: blur(4px);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: var(--header-height);
+                padding-bottom: var(--bottom-nav-height);
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .dark .card {
+            background: #1E293B;
+            border-color: var(--border-color);
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            padding: 24px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        }
+
+        .stat-card.amber {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+
+        .stat-card.emerald {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #4F46E5, #7C3AED, #F59E0B);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 24px;
+            width: 16px;
+            height: 16px;
+            background: #4F46E5;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+        }
+
+        .dark .timeline-dot {
+            border-color: #1E293B;
+        }
+
+        /* Transport Types */
+        .transport-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .transport-flight { background: #DBEAFE; color: #1D4ED8; }
+        .transport-train { background: #D1FAE5; color: #059669; }
+        .transport-bus { background: #FEF3C7; color: #D97706; }
+        .transport-boat { background: #E0E7FF; color: #4F46E5; }
+
+        .dark .transport-flight { background: #1E3A5F; color: #60A5FA; }
+        .dark .transport-train { background: #064E3B; color: #34D399; }
+        .dark .transport-bus { background: #78350F; color: #FCD34D; }
+        .dark .transport-boat { background: #312E81; color: #A5B4FC; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        .dark .modal-content {
+            background: #1E293B;
+            color: #F8FAFC;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .dark .btn-secondary {
+            background: #334155;
+            color: #CBD5E1;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+        }
+
+        /* Form Inputs */
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .dark .form-input {
+            background: #334155;
+            border-color: #475569;
+            color: #F8FAFC;
+        }
+
+        .dark .form-input:focus {
+            border-color: #818CF8;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
+        }
+
+        /* Sync Status */
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .sync-connected { background: #D1FAE5; color: #059669; }
+        .sync-disconnected { background: #FEE2E2; color: #DC2626; }
+        .sync-syncing { background: #FEF3C7; color: #D97706; }
+
+        .dark .sync-connected { background: #064E3B; color: #34D399; }
+        .dark .sync-disconnected { background: #7F1D1D; color: #FCA5A5; }
+        .dark .sync-syncing { background: #78350F; color: #FCD34D; }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Loading Spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748B; }
+        .dark ::-webkit-scrollbar-track { background: #1E293B; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+        /* Print */
+        @media print {
+            .sidebar, .mobile-header, .bottom-nav, .no-print { display: none !important; }
+            .main-content { margin: 0 !important; padding: 0 !important; }
+            body { background: white !important; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+
+        .dark .empty-state-icon {
+            background: linear-gradient(135deg, #312E81 0%, #3730A3 100%);
+        }
+
+        /* Upcoming Trip Cards */
+        .trip-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+        }
+
+        .trip-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        /* Activity List */
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .dark .activity-item {
+            border-color: #475569;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Fab Button */
+        .fab {
+            position: fixed;
+            bottom: calc(var(--bottom-nav-height) + 20px);
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+            cursor: pointer;
+            z-index: 80;
+            transition: all 0.3s;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 1024px) {
+            .fab {
+                display: flex;
+            }
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748B;
+            background: #F8FAFC;
+            border-bottom: 2px solid #E2E8F0;
+        }
+
+        .dark .data-table th {
+            background: #334155;
+            color: #94A3B8;
+            border-color: #475569;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .dark .data-table td {
+            border-color: #475569;
+        }
+
+        .data-table tr:hover td {
+            background: #F8FAFC;
+        }
+
+        .dark .data-table tr:hover td {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-plane-departure text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white font-bold text-xl">TravelPlan</h1>
+                    <p class="text-white/60 text-sm">Pro Edition</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="py-4">
+            <div class="px-6 py-2 text-xs font-semibold text-white/40 uppercase tracking-wider">Main Menu</div>
+            
+            <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-tab="itinerary" onclick="switchTab('itinerary')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Full Itinerary</span>
+            </div>
+            <div class="nav-item" data-tab="hotels" onclick="switchTab('hotels')">
+                <i class="fas fa-hotel"></i>
+                <span>Hotels</span>
+            </div>
+            <div class="nav-item" data-tab="transport-guide" onclick="switchTab('transport-guide')">
+                <i class="fas fa-route"></i>
+                <span>Transport Guide</span>
+            </div>
+            <div class="nav-item" data-tab="transport-list" onclick="switchTab('transport-list')">
+                <i class="fas fa-list-ul"></i>
+                <span>Transport List</span>
+            </div>
+            <div class="nav-item" data-tab="builder" onclick="switchTab('builder')">
+                <i class="fas fa-magic"></i>
+                <span>Day Builder</span>
+            </div>
+
+            <div class="px-6 py-2 mt-6 text-xs font-semibold text-white/40 uppercase tracking-wider">Settings</div>
+            
+            <div class="nav-item" onclick="openFirebaseSettings()">
+                <i class="fas fa-database"></i>
+                <span>Database</span>
+            </div>
+            <div class="nav-item" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </div>
+            <div class="nav-item" onclick="exportData()">
+                <i class="fas fa-download"></i>
+                <span>Export Data</span>
+            </div>
+        </nav>
+
+        <!-- Sync Status -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+            <div id="sidebarSyncStatus" class="sync-badge sync-connected">
+                <div class="pulse-dot"></div>
+                <span>Connected</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button onclick="toggleSidebar()" class="text-white p-2">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <i class="fas fa-plane-departure text-white"></i>
+            <span class="text-white font-semibold">TravelPlan</span>
+        </div>
+        <div id="mobileSyncStatus" class="sync-badge sync-connected text-xs">
+            <div class="pulse-dot"></div>
+        </div>
+    </header>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <div class="bottom-nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="bottom-nav-item" data-tab="itinerary" onclick="switchTab('itinerary')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Itinerary</span>
+            </div>
+            <div class="bottom-nav-item" data-tab="hotels" onclick="switchTab('hotels')">
+                <i class="fas fa-hotel"></i>
+                <span>Hotels</span>
+            </div>
+            <div class="bottom-nav-item" data-tab="transport-guide" onclick="switchTab('transport-guide')">
+                <i class="fas fa-train"></i>
+                <span>Transport</span>
+            </div>
+            <div class="bottom-nav-item" data-tab="builder" onclick="switchTab('builder')">
+                <i class="fas fa-plus-circle"></i>
+                <span>Builder</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Action Button (Mobile) -->
+    <div id="fab" class="fab no-print" onclick="handleFabClick()">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="p-4 md:p-8">
+            <!-- Dashboard View -->
+            <div id="tab-dashboard" class="tab-content">
+                <div class="mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-2">Welcome Back! 👋</h1>
+                    <p class="text-gray-500 dark:text-gray-400">Here's your travel overview</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card purple text-white">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold" id="statDays">0</div>
+                        <div class="text-white/70 text-sm">Travel Days</div>
+                    </div>
+                    <div class="stat-card blue text-white">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold" id="statHotels">0</div>
+                        <div class="text-white/70 text-sm">Hotels</div>
+                    </div>
+                    <div class="stat-card amber text-white">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-train"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold" id="statTransport">0</div>
+                        <div class="text-white/70 text-sm">Transports</div>
+                    </div>
+                    <div class="stat-card emerald text-white">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold" id="statCities">0</div>
+                        <div class="text-white/70 text-sm">Cities</div>
+                    </div>
+                </div>
+
+                <!-- Load Trip Banner -->
+                <div id="loadTripBanner" class="card p-6 mb-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold mb-2">🇨🇭🇮🇹 Load Alpine Romance Trip</h2>
+                            <p class="text-white/80">10-day adventure: Geneva → Montreux → Interlaken → Lucerne → Milan → Lake Como</p>
+                        </div>
+                        <button onclick="loadAlpineRomanceData()" class="btn bg-white text-emerald-600 hover:bg-gray-100 whitespace-nowrap">
+                            <i class="fas fa-download"></i> Load Trip Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Upcoming -->
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- Upcoming Days -->
+                    <div class="lg:col-span-2 card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                                <i class="fas fa-clock text-purple-500 mr-2"></i>Upcoming Days
+                            </h2>
+                            <button onclick="switchTab('itinerary')" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                                View All <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div id="upcomingDays" class="space-y-3">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card p-6">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-6">
+                            <i class="fas fa-bolt text-amber-500 mr-2"></i>Quick Actions
+                        </h2>
+                        <div class="space-y-3">
+                            <button onclick="openDayModal()" class="w-full btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Day
+                            </button>
+                            <button onclick="openHotelModal()" class="w-full btn btn-secondary">
+                                <i class="fas fa-hotel"></i> Add Hotel
+                            </button>
+                            <button onclick="openTransportModal()" class="w-full btn btn-secondary">
+                                <i class="fas fa-train"></i> Add Transport
+                            </button>
+                            <button onclick="printItinerary()" class="w-full btn btn-secondary">
+                                <i class="fas fa-print"></i> Print Itinerary
+                            </button>
+                            <button onclick="loadAlpineRomanceData()" class="w-full btn bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                                <i class="fas fa-mountain"></i> 🇨🇭 Alpine Trip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transport -->
+                <div class="card p-6 mt-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white">
+                            <i class="fas fa-route text-blue-500 mr-2"></i>Transport Schedule
+                        </h2>
+                        <button onclick="switchTab('transport-guide')" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                            View All <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                    <div id="recentTransport" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Itinerary View -->
+            <div id="tab-itinerary" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Full Itinerary</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Your complete travel plan</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="relative flex-1 md:w-64">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchInput" placeholder="Search..." 
+                                class="form-input pl-11" oninput="filterItems()">
+                        </div>
+                        <button onclick="openDayModal()" class="btn btn-primary whitespace-nowrap">
+                            <i class="fas fa-plus"></i><span class="hidden md:inline"> Add Day</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="itineraryContainer" class="timeline-container"></div>
+            </div>
+
+            <!-- Hotels View -->
+            <div id="tab-hotels" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Hotels</h1>
+                        <p class="text-gray-500 dark:text-gray-400">All your accommodations</p>
+                    </div>
+                    <button onclick="openHotelModal()" class="btn btn-primary whitespace-nowrap">
+                        <i class="fas fa-plus"></i> Add Hotel
+                    </button>
+                </div>
+                <div id="hotelsContainer" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+            </div>
+
+            <!-- Transport Guide View -->
+            <div id="tab-transport-guide" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Transport Guide</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Detailed transport information</p>
+                    </div>
+                    <button onclick="openTransportModal()" class="btn btn-primary whitespace-nowrap">
+                        <i class="fas fa-plus"></i> Add Transport
+                    </button>
+                </div>
+                <div id="transportGuideContainer" class="space-y-4"></div>
+            </div>
+
+            <!-- Transport List View -->
+            <div id="tab-transport-list" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Transport List</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Simple schedule view</p>
+                    </div>
+                </div>
+                <div class="card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Route</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transportListTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day Builder View -->
+            <div id="tab-builder" class="tab-content hidden">
+                <div class="mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Day Builder</h1>
+                    <p class="text-gray-500 dark:text-gray-400">Create your perfect travel day</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Builder Form -->
+                    <div class="card p-6">
+                        <form id="dayBuilderForm" class="space-y-5">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date *</label>
+                                    <input type="date" id="builderDate" required class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City *</label>
+                                    <input type="text" id="builderCity" required placeholder="e.g., Paris" class="form-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-hotel text-purple-500 mr-1"></i>Hotel
+                                </label>
+                                <select id="builderHotel" class="form-input">
+                                    <option value="">Select hotel...</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-train text-blue-500 mr-1"></i>Transport
+                                </label>
+                                <select id="builderTransport" multiple class="form-input h-28"></select>
+                                <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-tasks text-green-500 mr-1"></i>Activities
+                                </label>
+                                <div id="activitiesContainer" class="space-y-2 mb-2"></div>
+                                <button type="button" onclick="addActivityInput()" class="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:underline">
+                                    <i class="fas fa-plus mr-1"></i>Add Activity
+                                </button>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-sticky-note text-amber-500 mr-1"></i>Notes
+                                </label>
+                                <textarea id="builderNotes" rows="3" placeholder="Additional notes..." class="form-input"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-images text-pink-500 mr-1"></i>Images
+                                </label>
+                                <input type="file" id="builderImages" accept="image/*" multiple class="form-input">
+                                <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <i class="fas fa-file-pdf text-red-500 mr-1"></i>Documents
+                                </label>
+                                <input type="file" id="builderDocs" accept=".pdf" multiple class="form-input">
+                                <div id="docPreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
+                            </div>
+
+                            <div class="flex gap-3 pt-4">
+                                <button type="submit" class="flex-1 btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Day
+                                </button>
+                                <button type="button" onclick="resetBuilder()" class="btn btn-secondary">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Live Preview -->
+                    <div class="card p-6">
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-eye text-indigo-500"></i>Live Preview
+                        </h3>
+                        <div id="dayPreview" class="text-gray-500 dark:text-gray-400">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <p>Fill the form to see preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase Config Modal -->
+    <div id="firebaseConfigModal" class="modal">
+        <div class="modal-content max-w-lg">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-fire text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Firebase Setup</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Connect to your database</p>
+                </div>
+
+                <!-- Tab switcher -->
+                <div class="flex mb-4 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <button type="button" onclick="switchConfigTab('json')" id="jsonTabBtn" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-white dark:bg-gray-600 text-gray-800 dark:text-white shadow">
+                        <i class="fas fa-code mr-2"></i>Paste JSON
+                    </button>
+                    <button type="button" onclick="switchConfigTab('manual')" id="manualTabBtn" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-edit mr-2"></i>Manual
+                    </button>
+                </div>
+
+                <!-- JSON Tab -->
+                <div id="jsonConfigTab">
+                    <textarea id="configJsonInput" rows="8" placeholder='Paste your Firebase config JSON here...' class="form-input font-mono text-sm mb-4"></textarea>
+                    <button type="button" onclick="connectWithJson()" class="w-full btn btn-primary">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                </div>
+
+                <!-- Manual Tab -->
+                <form id="firebaseConfigForm" class="space-y-4 hidden">
+                    <input type="text" id="configApiKey" required placeholder="API Key *" class="form-input">
+                    <input type="text" id="configAuthDomain" required placeholder="Auth Domain *" class="form-input">
+                    <input type="text" id="configDatabaseURL" required placeholder="Database URL *" class="form-input">
+                    <input type="text" id="configProjectId" required placeholder="Project ID *" class="form-input">
+                    <input type="text" id="configStorageBucket" placeholder="Storage Bucket" class="form-input">
+                    <button type="submit" class="w-full btn btn-primary">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                </form>
+
+                <div id="configError" class="hidden mt-4 p-4 bg-red-50 dark:bg-red-900/30 rounded-lg text-red-600 dark:text-red-400 text-sm">
+                    <i class="fas fa-exclamation-circle mr-2"></i><span id="configErrorText"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-white/90 dark:bg-gray-900/90 z-[2000] flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-plane-departure text-white text-2xl animate-pulse"></i>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 font-medium" id="loadingText">Connecting...</p>
+        </div>
+    </div>
+
+    <!-- Day Modal -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white" id="dayModalTitle">Add Day</h3>
+                    <button onclick="closeDayModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="dayForm" class="space-y-4">
+                    <input type="hidden" id="dayId">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date *</label>
+                            <input type="date" id="dayDate" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City *</label>
+                            <input type="text" id="dayCity" required class="form-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hotel</label>
+                        <select id="dayHotel" class="form-input"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Transport</label>
+                        <select id="dayTransport" multiple class="form-input h-24"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Activities (one per line)</label>
+                        <textarea id="dayActivities" rows="3" class="form-input"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                        <textarea id="dayNotes" rows="2" class="form-input"></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="flex-1 btn btn-primary">Save Day</button>
+                        <button type="button" onclick="closeDayModal()" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hotel Modal -->
+    <div id="hotelModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white" id="hotelModalTitle">Add Hotel</h3>
+                    <button onclick="closeHotelModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="hotelForm" class="space-y-4">
+                    <input type="hidden" id="hotelId">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hotel Name *</label>
+                        <input type="text" id="hotelName" required class="form-input" placeholder="e.g., Hotel Grand">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City *</label>
+                        <input type="text" id="hotelCity" required class="form-input" placeholder="e.g., Paris">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                        <input type="text" id="hotelAddress" class="form-input" placeholder="Full address">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Check-in *</label>
+                            <input type="date" id="hotelCheckIn" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Check-out *</label>
+                            <input type="date" id="hotelCheckOut" required class="form-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Booking Reference</label>
+                        <input type="text" id="hotelReference" class="form-input" placeholder="e.g., BK-12345">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contact</label>
+                        <input type="text" id="hotelContact" class="form-input" placeholder="Phone or email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirmation PDF</label>
+                        <input type="file" id="hotelPdf" accept=".pdf" class="form-input">
+                        <div id="hotelPdfPreview" class="mt-2"></div>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="flex-1 btn btn-primary">Save Hotel</button>
+                        <button type="button" onclick="closeHotelModal()" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transport Modal -->
+    <div id="transportModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white" id="transportModalTitle">Add Transport</h3>
+                    <button onclick="closeTransportModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="transportForm" class="space-y-4">
+                    <input type="hidden" id="transportId">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date *</label>
+                        <input type="date" id="transportDate" required class="form-input">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From *</label>
+                            <input type="text" id="transportFrom" required class="form-input" placeholder="Departure city">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">To *</label>
+                            <input type="text" id="transportTo" required class="form-input" placeholder="Arrival city">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type *</label>
+                        <select id="transportType" required class="form-input">
+                            <option value="flight">✈️ Flight</option>
+                            <option value="train">🚆 Train</option>
+                            <option value="bus">🚌 Bus</option>
+                            <option value="boat">⛴️ Boat</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Departure *</label>
+                            <input type="time" id="transportDeparture" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Arrival *</label>
+                            <input type="time" id="transportArrival" required class="form-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Seat/Coach</label>
+                        <input type="text" id="transportSeat" class="form-input" placeholder="e.g., Car 4, Seat 25">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Booking Reference</label>
+                        <input type="text" id="transportReference" class="form-input" placeholder="e.g., TKT-123456">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                        <textarea id="transportNotes" rows="2" class="form-input" placeholder="Platform, gate, etc."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ticket PDF</label>
+                        <input type="file" id="transportPdf" accept=".pdf" class="form-input">
+                        <div id="transportPdfPreview" class="mt-2"></div>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="flex-1 btn btn-primary">Save Transport</button>
+                        <button type="button" onclick="closeTransportModal()" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Settings Modal -->
+    <div id="firebaseSettingsModal" class="modal">
+        <div class="modal-content max-w-lg">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                        <i class="fas fa-database mr-2 text-indigo-500"></i>Database Settings
+                    </h3>
+                    <button onclick="closeFirebaseSettings()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6">
+                    <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-3">Current Connection</h4>
+                    <div id="configDetails" class="text-sm space-y-2"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="loadAlpineRomanceData()" class="w-full btn btn-primary bg-gradient-to-r from-emerald-500 to-teal-600">
+                        <i class="fas fa-mountain"></i> 🇨🇭🇮🇹 Load Alpine Romance Trip
+                    </button>
+                    <button onclick="loadSampleData()" class="w-full btn btn-secondary">
+                        <i class="fas fa-database"></i> Load Sample Data
+                    </button>
+                    <button onclick="clearAllData()" class="w-full btn btn-danger">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                    <button onclick="reconfigureFirebase()" class="w-full btn btn-secondary">
+                        <i class="fas fa-cog"></i> Change Config
+                    </button>
+                    <button onclick="resetToDefaultConfig()" class="w-full btn btn-secondary">
+                        <i class="fas fa-undo"></i> Reset to Default
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Viewer Modal -->
+    <div id="fileViewerModal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white" id="fileViewerTitle">File</h3>
+                    <button onclick="closeFileViewer()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="fileViewerContent" class="min-h-[400px] flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-xl"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">Day Images</h3>
+                    <button onclick="closeGallery()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="galleryContent" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIREBASE CONFIGURATION ====================
+        let firebaseApp = null;
+        let database = null;
+        let isOnline = false;
+
+        let dataCache = { days: {}, hotels: {}, transport: {}, files: {} };
+
+        const FIREBASE_CONFIG_KEY = 'travelplan_firebase_config';
+        const SETTINGS_KEY = 'travelplan_settings';
+
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCCBwBUlP9ofAOAOXtQUfXsXmlUjXAo7XU",
+            authDomain: "switzerland-2a2cb.firebaseapp.com",
+            databaseURL: "https://switzerland-2a2cb-default-rtdb.firebaseio.com",
+            projectId: "switzerland-2a2cb",
+            storageBucket: "switzerland-2a2cb.firebasestorage.app",
+            messagingSenderId: "955702821704",
+            appId: "1:955702821704:web:3d8241b6dc784c43bce97d"
+        };
+
+        function getSavedFirebaseConfig() {
+            const config = localStorage.getItem(FIREBASE_CONFIG_KEY);
+            return config ? JSON.parse(config) : DEFAULT_FIREBASE_CONFIG;
+        }
+
+        function saveFirebaseConfig(config) {
+            localStorage.setItem(FIREBASE_CONFIG_KEY, JSON.stringify(config));
+        }
+
+        function switchConfigTab(tab) {
+            const jsonTab = document.getElementById('jsonConfigTab');
+            const manualForm = document.getElementById('firebaseConfigForm');
+            const jsonBtn = document.getElementById('jsonTabBtn');
+            const manualBtn = document.getElementById('manualTabBtn');
+
+            if (tab === 'json') {
+                jsonTab.classList.remove('hidden');
+                manualForm.classList.add('hidden');
+                jsonBtn.classList.add('bg-white', 'dark:bg-gray-600', 'shadow');
+                jsonBtn.classList.remove('text-gray-600');
+                manualBtn.classList.remove('bg-white', 'dark:bg-gray-600', 'shadow');
+                manualBtn.classList.add('text-gray-600');
+            } else {
+                jsonTab.classList.add('hidden');
+                manualForm.classList.remove('hidden');
+                manualBtn.classList.add('bg-white', 'dark:bg-gray-600', 'shadow');
+                manualBtn.classList.remove('text-gray-600');
+                jsonBtn.classList.remove('bg-white', 'dark:bg-gray-600', 'shadow');
+                jsonBtn.classList.add('text-gray-600');
+            }
+        }
+
+        async function connectWithJson() {
+            const jsonInput = document.getElementById('configJsonInput').value.trim();
+            if (!jsonInput) { showConfigError('Please paste your Firebase config'); return; }
+
+            try {
+                let configStr = jsonInput;
+                if (configStr.includes('=')) configStr = configStr.substring(configStr.indexOf('{'));
+                configStr = configStr.replace(/;[\s]*$/, '');
+                const config = JSON.parse(configStr);
+                if (!config.apiKey || !config.projectId) throw new Error('Missing required fields');
+                if (!config.databaseURL) config.databaseURL = `https://${config.projectId}-default-rtdb.firebaseio.com`;
+                await initFirebase(config);
+            } catch (error) {
+                showConfigError('Invalid JSON: ' + error.message);
+            }
+        }
+
+        async function initFirebase(config) {
+            try {
+                showLoading('Connecting to Firebase...');
+                firebaseApp = firebase.initializeApp(config);
+                database = firebase.database();
+
+                database.ref('.info/connected').on('value', (snap) => {
+                    isOnline = snap.val() === true;
+                    updateSyncStatus();
+                });
+
+                setupRealtimeListeners();
+                saveFirebaseConfig(config);
+                hideLoading();
+                document.getElementById('firebaseConfigModal').classList.remove('active');
+                return true;
+            } catch (error) {
+                hideLoading();
+                showConfigError(error.message);
+                return false;
+            }
+        }
+
+        function setupRealtimeListeners() {
+            database.ref('days').on('value', (snapshot) => {
+                dataCache.days = snapshot.val() || {};
+                localStorage.setItem('travelplan_offline_data', JSON.stringify(dataCache));
+                renderAll();
+                updateSelects();
+            });
+
+            database.ref('hotels').on('value', (snapshot) => {
+                dataCache.hotels = snapshot.val() || {};
+                localStorage.setItem('travelplan_offline_data', JSON.stringify(dataCache));
+                renderAll();
+                updateSelects();
+            });
+
+            database.ref('transport').on('value', (snapshot) => {
+                dataCache.transport = snapshot.val() || {};
+                localStorage.setItem('travelplan_offline_data', JSON.stringify(dataCache));
+                renderAll();
+                updateSelects();
+            });
+
+            database.ref('files').on('value', (snapshot) => {
+                dataCache.files = snapshot.val() || {};
+                localStorage.setItem('travelplan_offline_data', JSON.stringify(dataCache));
+            });
+        }
+
+        function updateSyncStatus() {
+            const sidebarStatus = document.getElementById('sidebarSyncStatus');
+            const mobileStatus = document.getElementById('mobileSyncStatus');
+            
+            if (isOnline) {
+                sidebarStatus.className = 'sync-badge sync-connected';
+                sidebarStatus.innerHTML = '<div class="pulse-dot"></div><span>Connected</span>';
+                mobileStatus.className = 'sync-badge sync-connected text-xs';
+                mobileStatus.innerHTML = '<div class="pulse-dot"></div>';
+            } else {
+                sidebarStatus.className = 'sync-badge sync-syncing';
+                sidebarStatus.innerHTML = '<i class="fas fa-circle-notch animate-spin text-xs"></i><span>Reconnecting</span>';
+                mobileStatus.className = 'sync-badge sync-syncing text-xs';
+                mobileStatus.innerHTML = '<i class="fas fa-circle-notch animate-spin text-xs"></i>';
+            }
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function showConfigError(message) {
+            const errorEl = document.getElementById('configError');
+            document.getElementById('configErrorText').textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        document.getElementById('firebaseConfigForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const config = {
+                apiKey: document.getElementById('configApiKey').value,
+                authDomain: document.getElementById('configAuthDomain').value,
+                databaseURL: document.getElementById('configDatabaseURL').value,
+                projectId: document.getElementById('configProjectId').value,
+                storageBucket: document.getElementById('configStorageBucket').value || undefined
+            };
+            await initFirebase(config);
+        });
+
+        // ==================== CRUD OPERATIONS ====================
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+        function getDays() { return Object.values(dataCache.days || {}).sort((a, b) => new Date(a.date) - new Date(b.date)); }
+        function getHotels() { return Object.values(dataCache.hotels || {}).sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn)); }
+        function getTransport() { return Object.values(dataCache.transport || {}).sort((a, b) => new Date(a.date) - new Date(b.date) || a.departureTime.localeCompare(b.departureTime)); }
+
+        async function saveDay(day) { await database.ref('days/' + day.id).set(day); }
+        async function deleteDay(id) { if (confirm('Delete this day?')) await database.ref('days/' + id).remove(); }
+        async function saveHotel(hotel) { await database.ref('hotels/' + hotel.id).set(hotel); }
+        async function deleteHotel(id) { if (confirm('Delete this hotel?')) await database.ref('hotels/' + id).remove(); }
+        async function saveTransport(transport) { await database.ref('transport/' + transport.id).set(transport); }
+        async function deleteTransport(id) { if (confirm('Delete this transport?')) await database.ref('transport/' + id).remove(); }
+        async function saveFile(id, data, type, name) { await database.ref('files/' + id).set({ id, data, type, name }); return id; }
+        async function getFile(id) { return dataCache.files[id] || null; }
+        async function deleteFile(id) { await database.ref('files/' + id).remove(); }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ==================== RENDERING ====================
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatShortDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function getTransportIcon(type) {
+            const icons = { flight: 'fa-plane', train: 'fa-train', bus: 'fa-bus', boat: 'fa-ship' };
+            return icons[type] || 'fa-car';
+        }
+
+        function getTransportEmoji(type) {
+            const emojis = { flight: '✈️', train: '🚆', bus: '🚌', boat: '⛴️' };
+            return emojis[type] || '🚗';
+        }
+
+        function renderDashboard() {
+            const days = getDays();
+            const hotels = getHotels();
+            const transports = getTransport();
+            const cities = [...new Set(days.map(d => d.city))];
+
+            document.getElementById('statDays').textContent = days.length;
+            document.getElementById('statHotels').textContent = hotels.length;
+            document.getElementById('statTransport').textContent = transports.length;
+            document.getElementById('statCities').textContent = cities.length;
+            
+            // Hide/show the load trip banner based on whether data exists
+            const banner = document.getElementById('loadTripBanner');
+            if (banner) {
+                banner.style.display = (days.length === 0 && hotels.length === 0) ? 'block' : 'none';
+            }
+
+            // Upcoming days
+            const upcomingContainer = document.getElementById('upcomingDays');
+            const upcomingDays = days.slice(0, 5);
+            
+            if (upcomingDays.length === 0) {
+                upcomingContainer.innerHTML = `
+                    <div class="empty-state py-8">
+                        <div class="empty-state-icon"><i class="fas fa-calendar-plus"></i></div>
+                        <p class="text-gray-500 dark:text-gray-400">No days planned yet</p>
+                        <button onclick="switchTab('builder')" class="btn btn-primary mt-4">Create First Day</button>
+                    </div>`;
+            } else {
+                upcomingContainer.innerHTML = upcomingDays.map(day => {
+                    const hotel = hotels.find(h => h.id === day.hotelId);
+                    return `
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer" onclick="switchTab('itinerary')">
+                            <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex flex-col items-center justify-center text-white">
+                                <span class="text-xs font-medium">${new Date(day.date).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                <span class="text-lg font-bold">${new Date(day.date).getDate()}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-gray-800 dark:text-white truncate">${day.city}</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                    ${hotel ? `<i class="fas fa-hotel mr-1"></i>${hotel.name}` : `${(day.activities || []).length} activities`}
+                                </p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>`;
+                }).join('');
+            }
+
+            // Recent transport
+            const transportContainer = document.getElementById('recentTransport');
+            const recentTransport = transports.slice(0, 4);
+            
+            if (recentTransport.length === 0) {
+                transportContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-train text-3xl mb-2 text-gray-300"></i>
+                        <p>No transport bookings</p>
+                    </div>`;
+            } else {
+                transportContainer.innerHTML = recentTransport.map(t => `
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                        <div class="w-12 h-12 transport-${t.type} rounded-xl flex items-center justify-center text-xl">
+                            ${getTransportEmoji(t.type)}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                <span>${formatShortDate(t.date)}</span>
+                                <span>•</span>
+                                <span>${t.departureTime}</span>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 dark:text-white truncate">${t.from} → ${t.to}</h4>
+                        </div>
+                        <span class="transport-badge transport-${t.type} capitalize">${t.type}</span>
+                    </div>`).join('');
+            }
+        }
+
+        function renderItinerary() {
+            const container = document.getElementById('itineraryContainer');
+            const days = getDays();
+            const hotels = getHotels();
+            const transports = getTransport();
+            const searchTerm = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+
+            let filteredDays = days.filter(day => 
+                !searchTerm || day.city.toLowerCase().includes(searchTerm) || 
+                (day.activities || []).some(a => a.toLowerCase().includes(searchTerm))
+            );
+
+            if (filteredDays.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-calendar-plus"></i></div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">No Days Yet</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Start planning your trip!</p>
+                        <button onclick="openDayModal()" class="btn btn-primary">Add First Day</button>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filteredDays.map(day => {
+                const hotel = hotels.find(h => h.id === day.hotelId);
+                const dayTransports = (day.transportIds || []).map(id => transports.find(t => t.id === id)).filter(Boolean);
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="card p-5">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">${formatDate(day.date)}</span>
+                                    <h3 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2 mt-1">
+                                        <i class="fas fa-map-marker-alt text-red-500"></i>${day.city}
+                                    </h3>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="editDay('${day.id}')" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteDay('${day.id}')" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            ${hotel ? `
+                                <div class="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl mb-3">
+                                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-hotel text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-800 dark:text-white">${hotel.name}</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">${hotel.address || hotel.city}</div>
+                                    </div>
+                                </div>` : ''}
+
+                            ${dayTransports.length > 0 ? `
+                                <div class="space-y-2 mb-3">
+                                    ${dayTransports.map(t => `
+                                        <div class="flex items-center gap-3 p-3 transport-${t.type} rounded-xl">
+                                            <i class="fas ${getTransportIcon(t.type)}"></i>
+                                            <div class="flex-1">
+                                                <div class="font-medium">${t.from} → ${t.to}</div>
+                                                <div class="text-sm opacity-75">${t.departureTime} - ${t.arrivalTime}</div>
+                                            </div>
+                                        </div>`).join('')}
+                                </div>` : ''}
+
+                            ${(day.activities || []).length > 0 ? `
+                                <div class="mb-3">
+                                    <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Activities</div>
+                                    ${day.activities.map(a => `
+                                        <div class="activity-item">
+                                            <div class="activity-icon bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            <span class="text-gray-700 dark:text-gray-300">${a}</span>
+                                        </div>`).join('')}
+                                </div>` : ''}
+
+                            ${day.notes ? `
+                                <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-sm text-amber-800 dark:text-amber-200">
+                                    <i class="fas fa-sticky-note mr-2"></i>${day.notes}
+                                </div>` : ''}
+
+                            ${(day.images && day.images.length) || (day.documents && day.documents.length) ? `
+                                <div class="flex gap-2 mt-3 pt-3 border-t dark:border-gray-700">
+                                    ${day.images?.length ? `<button onclick="showGallery('${day.id}')" class="px-3 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full text-sm font-medium"><i class="fas fa-images mr-1"></i>${day.images.length}</button>` : ''}
+                                    ${day.documents?.length ? `<button onclick="showDocuments('${day.id}')" class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-sm font-medium"><i class="fas fa-file-pdf mr-1"></i>${day.documents.length}</button>` : ''}
+                                </div>` : ''}
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderHotels() {
+            const container = document.getElementById('hotelsContainer');
+            const hotels = getHotels();
+
+            if (hotels.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-hotel"></i></div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">No Hotels</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Add your first accommodation</p>
+                        <button onclick="openHotelModal()" class="btn btn-primary">Add Hotel</button>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = hotels.map(hotel => {
+                const nights = Math.ceil((new Date(hotel.checkOut) - new Date(hotel.checkIn)) / (1000 * 60 * 60 * 24));
+                return `
+                    <div class="card p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center text-white">
+                                <i class="fas fa-hotel text-lg"></i>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editHotel('${hotel.id}')" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-indigo-600">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </button>
+                                <button onclick="deleteHotel('${hotel.id}')" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-red-600">
+                                    <i class="fas fa-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-gray-800 dark:text-white mb-1">${hotel.name}</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-3"><i class="fas fa-map-marker-alt mr-1"></i>${hotel.city}</p>
+                        ${hotel.address ? `<p class="text-gray-400 text-sm mb-3">${hotel.address}</p>` : ''}
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl mb-3">
+                            <div class="text-center">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Check-in</div>
+                                <div class="font-medium text-gray-800 dark:text-white">${formatShortDate(hotel.checkIn)}</div>
+                            </div>
+                            <div class="text-center px-3">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Nights</div>
+                                <div class="font-bold text-indigo-600 dark:text-indigo-400">${nights}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Check-out</div>
+                                <div class="font-medium text-gray-800 dark:text-white">${formatShortDate(hotel.checkOut)}</div>
+                            </div>
+                        </div>
+
+                        ${hotel.reference ? `<div class="text-sm text-gray-500 dark:text-gray-400 mb-2"><i class="fas fa-hashtag mr-1"></i>${hotel.reference}</div>` : ''}
+                        ${hotel.contact ? `<div class="text-sm text-gray-500 dark:text-gray-400 mb-2"><i class="fas fa-phone mr-1"></i>${hotel.contact}</div>` : ''}
+                        ${hotel.pdfId ? `<button onclick="viewFile('${hotel.pdfId}')" class="btn btn-secondary w-full mt-2"><i class="fas fa-file-pdf text-red-500"></i> View Confirmation</button>` : ''}
+                    </div>`;
+            }).join('');
+        }
+
+        function renderTransportGuide() {
+            const container = document.getElementById('transportGuideContainer');
+            const transports = getTransport();
+
+            if (transports.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-train"></i></div>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">No Transport</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">Add your travel bookings</p>
+                        <button onclick="openTransportModal()" class="btn btn-primary">Add Transport</button>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = transports.map(t => `
+                <div class="card p-5">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 transport-${t.type} rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
+                                ${getTransportEmoji(t.type)}
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">${formatDate(t.date)}</span>
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-white">${t.from} → ${t.to}</h3>
+                                <div class="flex items-center gap-4 mt-1 text-sm">
+                                    <span class="text-green-600 dark:text-green-400"><i class="fas fa-clock mr-1"></i>${t.departureTime}</span>
+                                    <span class="text-gray-400">→</span>
+                                    <span class="text-blue-600 dark:text-blue-400"><i class="fas fa-clock mr-1"></i>${t.arrivalTime}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editTransport('${t.id}')" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-indigo-600">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTransport('${t.id}')" class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 hover:text-red-600">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t dark:border-gray-700">
+                        <div><span class="text-xs text-gray-500 dark:text-gray-400 block">Type</span><span class="font-medium text-gray-800 dark:text-white capitalize">${t.type}</span></div>
+                        ${t.seat ? `<div><span class="text-xs text-gray-500 dark:text-gray-400 block">Seat</span><span class="font-medium text-gray-800 dark:text-white">${t.seat}</span></div>` : ''}
+                        ${t.reference ? `<div><span class="text-xs text-gray-500 dark:text-gray-400 block">Reference</span><span class="font-medium text-gray-800 dark:text-white">${t.reference}</span></div>` : ''}
+                        ${t.pdfId ? `<div><button onclick="viewFile('${t.pdfId}')" class="text-red-600 dark:text-red-400 font-medium hover:underline"><i class="fas fa-file-pdf mr-1"></i>View Ticket</button></div>` : ''}
+                    </div>
+                    ${t.notes ? `<div class="mt-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl text-sm text-gray-600 dark:text-gray-400"><i class="fas fa-info-circle mr-2"></i>${t.notes}</div>` : ''}
+                </div>`).join('');
+        }
+
+        function renderTransportList() {
+            const tbody = document.getElementById('transportListTable');
+            const transports = getTransport();
+
+            if (transports.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-500 dark:text-gray-400">No transport bookings</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = transports.map(t => `
+                <tr>
+                    <td class="text-gray-800 dark:text-white font-medium">${formatShortDate(t.date)}</td>
+                    <td><span class="font-medium text-gray-800 dark:text-white">${t.from}</span> <span class="text-gray-400 mx-1">→</span> <span class="font-medium text-gray-800 dark:text-white">${t.to}</span></td>
+                    <td><span class="transport-badge transport-${t.type} capitalize">${t.type}</span></td>
+                    <td class="text-gray-600 dark:text-gray-400">${t.departureTime} - ${t.arrivalTime}</td>
+                    <td class="text-gray-500 dark:text-gray-400 text-sm">${t.notes || '-'}</td>
+                </tr>`).join('');
+        }
+
+        function renderAll() {
+            renderDashboard();
+            renderItinerary();
+            renderHotels();
+            renderTransportGuide();
+            renderTransportList();
+        }
+
+        // ==================== MODALS ====================
+        function openDayModal(day = null) {
+            document.getElementById('dayModal').classList.add('active');
+            document.getElementById('dayModalTitle').textContent = day ? 'Edit Day' : 'Add Day';
+            updateSelects();
+            
+            if (day) {
+                document.getElementById('dayId').value = day.id;
+                document.getElementById('dayDate').value = day.date;
+                document.getElementById('dayCity').value = day.city;
+                document.getElementById('dayHotel').value = day.hotelId || '';
+                document.getElementById('dayActivities').value = (day.activities || []).join('\n');
+                document.getElementById('dayNotes').value = day.notes || '';
+                Array.from(document.getElementById('dayTransport').options).forEach(opt => {
+                    opt.selected = (day.transportIds || []).includes(opt.value);
+                });
+            } else {
+                document.getElementById('dayForm').reset();
+                document.getElementById('dayId').value = '';
+            }
+        }
+
+        function closeDayModal() { document.getElementById('dayModal').classList.remove('active'); }
+        function editDay(id) { const day = getDays().find(d => d.id === id); if (day) openDayModal(day); }
+
+        function openHotelModal(hotel = null) {
+            document.getElementById('hotelModal').classList.add('active');
+            document.getElementById('hotelModalTitle').textContent = hotel ? 'Edit Hotel' : 'Add Hotel';
+            document.getElementById('hotelPdfPreview').innerHTML = '';
+            
+            if (hotel) {
+                document.getElementById('hotelId').value = hotel.id;
+                document.getElementById('hotelName').value = hotel.name;
+                document.getElementById('hotelCity').value = hotel.city;
+                document.getElementById('hotelAddress').value = hotel.address || '';
+                document.getElementById('hotelCheckIn').value = hotel.checkIn;
+                document.getElementById('hotelCheckOut').value = hotel.checkOut;
+                document.getElementById('hotelReference').value = hotel.reference || '';
+                document.getElementById('hotelContact').value = hotel.contact || '';
+                if (hotel.pdfId) document.getElementById('hotelPdfPreview').innerHTML = `<span class="text-green-600 text-sm"><i class="fas fa-check-circle mr-1"></i>PDF attached</span>`;
+            } else {
+                document.getElementById('hotelForm').reset();
+                document.getElementById('hotelId').value = '';
+            }
+        }
+
+        function closeHotelModal() { document.getElementById('hotelModal').classList.remove('active'); }
+        function editHotel(id) { const hotel = getHotels().find(h => h.id === id); if (hotel) openHotelModal(hotel); }
+
+        function openTransportModal(transport = null) {
+            document.getElementById('transportModal').classList.add('active');
+            document.getElementById('transportModalTitle').textContent = transport ? 'Edit Transport' : 'Add Transport';
+            document.getElementById('transportPdfPreview').innerHTML = '';
+            
+            if (transport) {
+                document.getElementById('transportId').value = transport.id;
+                document.getElementById('transportDate').value = transport.date;
+                document.getElementById('transportFrom').value = transport.from;
+                document.getElementById('transportTo').value = transport.to;
+                document.getElementById('transportType').value = transport.type;
+                document.getElementById('transportDeparture').value = transport.departureTime;
+                document.getElementById('transportArrival').value = transport.arrivalTime;
+                document.getElementById('transportSeat').value = transport.seat || '';
+                document.getElementById('transportReference').value = transport.reference || '';
+                document.getElementById('transportNotes').value = transport.notes || '';
+                if (transport.pdfId) document.getElementById('transportPdfPreview').innerHTML = `<span class="text-green-600 text-sm"><i class="fas fa-check-circle mr-1"></i>PDF attached</span>`;
+            } else {
+                document.getElementById('transportForm').reset();
+                document.getElementById('transportId').value = '';
+            }
+        }
+
+        function closeTransportModal() { document.getElementById('transportModal').classList.remove('active'); }
+        function editTransport(id) { const t = getTransport().find(t => t.id === id); if (t) openTransportModal(t); }
+
+        function updateSelects() {
+            const hotels = getHotels();
+            const transports = getTransport();
+
+            ['dayHotel', 'builderHotel'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    const val = select.value;
+                    select.innerHTML = '<option value="">Select hotel...</option>' + hotels.map(h => `<option value="${h.id}">${h.name} - ${h.city}</option>`).join('');
+                    select.value = val;
+                }
+            });
+
+            ['dayTransport', 'builderTransport'].forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    const selected = Array.from(select.selectedOptions).map(o => o.value);
+                    select.innerHTML = transports.map(t => `<option value="${t.id}">${formatShortDate(t.date)} - ${t.from} → ${t.to}</option>`).join('');
+                    Array.from(select.options).forEach(opt => opt.selected = selected.includes(opt.value));
+                }
+            });
+        }
+
+        // ==================== FORM HANDLERS ====================
+        document.getElementById('dayForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const dayId = document.getElementById('dayId').value || generateId();
+            const existingDay = getDays().find(d => d.id === dayId);
+            
+            await saveDay({
+                id: dayId,
+                date: document.getElementById('dayDate').value,
+                city: document.getElementById('dayCity').value,
+                hotelId: document.getElementById('dayHotel').value || null,
+                transportIds: Array.from(document.getElementById('dayTransport').selectedOptions).map(o => o.value),
+                activities: document.getElementById('dayActivities').value.split('\n').filter(a => a.trim()),
+                notes: document.getElementById('dayNotes').value,
+                images: existingDay?.images || [],
+                documents: existingDay?.documents || []
+            });
+            closeDayModal();
+        });
+
+        document.getElementById('hotelForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const hotelId = document.getElementById('hotelId').value || generateId();
+            const existing = getHotels().find(h => h.id === hotelId);
+            
+            const hotel = {
+                id: hotelId,
+                name: document.getElementById('hotelName').value,
+                city: document.getElementById('hotelCity').value,
+                address: document.getElementById('hotelAddress').value,
+                checkIn: document.getElementById('hotelCheckIn').value,
+                checkOut: document.getElementById('hotelCheckOut').value,
+                reference: document.getElementById('hotelReference').value,
+                contact: document.getElementById('hotelContact').value,
+                pdfId: existing?.pdfId || null
+            };
+
+            const pdfInput = document.getElementById('hotelPdf');
+            if (pdfInput.files.length > 0) {
+                const base64 = await fileToBase64(pdfInput.files[0]);
+                hotel.pdfId = generateId();
+                await saveFile(hotel.pdfId, base64, 'pdf', pdfInput.files[0].name);
+            }
+
+            await saveHotel(hotel);
+            closeHotelModal();
+        });
+
+        document.getElementById('transportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const transportId = document.getElementById('transportId').value || generateId();
+            const existing = getTransport().find(t => t.id === transportId);
+            
+            const transport = {
+                id: transportId,
+                date: document.getElementById('transportDate').value,
+                from: document.getElementById('transportFrom').value,
+                to: document.getElementById('transportTo').value,
+                type: document.getElementById('transportType').value,
+                departureTime: document.getElementById('transportDeparture').value,
+                arrivalTime: document.getElementById('transportArrival').value,
+                seat: document.getElementById('transportSeat').value,
+                reference: document.getElementById('transportReference').value,
+                notes: document.getElementById('transportNotes').value,
+                pdfId: existing?.pdfId || null
+            };
+
+            const pdfInput = document.getElementById('transportPdf');
+            if (pdfInput.files.length > 0) {
+                const base64 = await fileToBase64(pdfInput.files[0]);
+                transport.pdfId = generateId();
+                await saveFile(transport.pdfId, base64, 'pdf', pdfInput.files[0].name);
+            }
+
+            await saveTransport(transport);
+            closeTransportModal();
+        });
+
+        // ==================== DAY BUILDER ====================
+        function addActivityInput() {
+            const container = document.getElementById('activitiesContainer');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.innerHTML = `
+                <input type="text" placeholder="Activity description" class="form-input flex-1">
+                <button type="button" onclick="this.parentElement.remove(); updateDayPreview();" class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-200"><i class="fas fa-times"></i></button>`;
+            container.appendChild(div);
+            div.querySelector('input').addEventListener('input', updateDayPreview);
+        }
+
+        function resetBuilder() {
+            document.getElementById('dayBuilderForm').reset();
+            document.getElementById('activitiesContainer').innerHTML = '';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('docPreviewContainer').innerHTML = '';
+            document.getElementById('dayPreview').innerHTML = `<div class="empty-state py-8"><div class="empty-state-icon"><i class="fas fa-eye"></i></div><p>Fill the form to see preview</p></div>`;
+        }
+
+        function updateDayPreview() {
+            const date = document.getElementById('builderDate').value;
+            const city = document.getElementById('builderCity').value;
+            const hotelId = document.getElementById('builderHotel').value;
+            const transportIds = Array.from(document.getElementById('builderTransport').selectedOptions).map(o => o.value);
+            const notes = document.getElementById('builderNotes').value;
+            const activities = Array.from(document.querySelectorAll('#activitiesContainer input')).map(i => i.value).filter(v => v.trim());
+
+            const hotel = getHotels().find(h => h.id === hotelId);
+            const transports = transportIds.map(id => getTransport().find(t => t.id === id)).filter(Boolean);
+            const preview = document.getElementById('dayPreview');
+            
+            if (!date && !city) {
+                preview.innerHTML = `<div class="empty-state py-8"><div class="empty-state-icon"><i class="fas fa-eye"></i></div><p>Fill the form to see preview</p></div>`;
+                return;
+            }
+
+            preview.innerHTML = `
+                <div class="border-l-4 border-indigo-500 pl-4 py-2">
+                    ${date ? `<div class="text-sm font-medium text-indigo-600 dark:text-indigo-400">${formatDate(date)}</div>` : ''}
+                    ${city ? `<h4 class="text-xl font-bold text-gray-800 dark:text-white mb-4">${city}</h4>` : ''}
+                    ${hotel ? `<div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl mb-3"><i class="fas fa-hotel text-purple-500 mr-2"></i><span class="font-medium">${hotel.name}</span></div>` : ''}
+                    ${transports.length ? `<div class="space-y-2 mb-3">${transports.map(t => `<div class="p-2 transport-${t.type} rounded-lg text-sm">${getTransportEmoji(t.type)} ${t.from} → ${t.to}</div>`).join('')}</div>` : ''}
+                    ${activities.length ? `<div class="mb-3"><div class="text-xs font-semibold text-gray-500 uppercase mb-2">Activities</div>${activities.map(a => `<div class="flex items-center gap-2 py-1"><i class="fas fa-check text-green-500"></i><span>${a}</span></div>`).join('')}</div>` : ''}
+                    ${notes ? `<div class="text-sm text-gray-500 dark:text-gray-400 italic">${notes}</div>` : ''}
+                </div>`;
+        }
+
+        ['builderDate', 'builderCity', 'builderHotel', 'builderTransport', 'builderNotes'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('change', updateDayPreview);
+            el.addEventListener('input', updateDayPreview);
+        });
+
+        document.getElementById('builderImages').addEventListener('change', async function(e) {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            for (const file of e.target.files) {
+                const base64 = await fileToBase64(file);
+                container.innerHTML += `<img src="${base64}" class="w-16 h-16 object-cover rounded-lg">`;
+            }
+        });
+
+        document.getElementById('builderDocs').addEventListener('change', function(e) {
+            const container = document.getElementById('docPreviewContainer');
+            container.innerHTML = '';
+            for (const file of e.target.files) {
+                container.innerHTML += `<div class="px-3 py-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-red-600 text-sm"><i class="fas fa-file-pdf mr-1"></i>${file.name}</div>`;
+            }
+        });
+
+        document.getElementById('dayBuilderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const activities = Array.from(document.querySelectorAll('#activitiesContainer input')).map(i => i.value).filter(v => v.trim());
+
+            const day = {
+                id: generateId(),
+                date: document.getElementById('builderDate').value,
+                city: document.getElementById('builderCity').value,
+                hotelId: document.getElementById('builderHotel').value || null,
+                transportIds: Array.from(document.getElementById('builderTransport').selectedOptions).map(o => o.value),
+                activities,
+                notes: document.getElementById('builderNotes').value,
+                images: [],
+                documents: []
+            };
+
+            for (const file of document.getElementById('builderImages').files) {
+                const base64 = await fileToBase64(file);
+                const fileId = generateId();
+                await saveFile(fileId, base64, 'image', file.name);
+                day.images.push(fileId);
+            }
+
+            for (const file of document.getElementById('builderDocs').files) {
+                const base64 = await fileToBase64(file);
+                const fileId = generateId();
+                await saveFile(fileId, base64, 'pdf', file.name);
+                day.documents.push(fileId);
+            }
+
+            await saveDay(day);
+            resetBuilder();
+            switchTab('itinerary');
+        });
+
+        // ==================== FILE VIEWER ====================
+        async function viewFile(fileId) {
+            const file = await getFile(fileId);
+            if (!file) { alert('File not found'); return; }
+            document.getElementById('fileViewerTitle').textContent = file.name || 'File';
+            document.getElementById('fileViewerContent').innerHTML = file.type === 'pdf' 
+                ? `<iframe src="${file.data}" class="w-full h-[500px] rounded-lg"></iframe>`
+                : `<img src="${file.data}" class="max-w-full max-h-[500px] rounded-lg">`;
+            document.getElementById('fileViewerModal').classList.add('active');
+        }
+
+        function closeFileViewer() { document.getElementById('fileViewerModal').classList.remove('active'); }
+
+        async function showGallery(dayId) {
+            const day = getDays().find(d => d.id === dayId);
+            if (!day?.images?.length) return;
+            
+            const modal = document.getElementById('galleryModal');
+            const content = document.getElementById('galleryContent');
+            content.innerHTML = '<div class="col-span-full text-center py-8">Loading...</div>';
+            modal.classList.add('active');
+            
+            let html = '';
+            for (const fileId of day.images) {
+                const file = await getFile(fileId);
+                if (file) html += `<img src="${file.data}" class="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-80" onclick="viewFile('${fileId}')">`;
+            }
+            content.innerHTML = html || '<div class="col-span-full text-center text-gray-500">No images</div>';
+        }
+
+        function closeGallery() { document.getElementById('galleryModal').classList.remove('active'); }
+
+        async function showDocuments(dayId) {
+            const day = getDays().find(d => d.id === dayId);
+            if (day?.documents?.length) viewFile(day.documents[0]);
+        }
+
+        // ==================== NAVIGATION ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`)?.classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.tab === tabName);
+            });
+            
+            document.querySelectorAll('.bottom-nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.tab === tabName);
+            });
+
+            updateSelects();
+            closeSidebar();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        function handleFabClick() {
+            const currentTab = document.querySelector('.tab-content:not(.hidden)')?.id?.replace('tab-', '');
+            if (currentTab === 'hotels') openHotelModal();
+            else if (currentTab === 'transport-guide' || currentTab === 'transport-list') openTransportModal();
+            else openDayModal();
+        }
+
+        // ==================== UTILITIES ====================
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            settings.darkMode = document.documentElement.classList.contains('dark');
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        function printItinerary() { window.print(); }
+        function filterItems() { renderItinerary(); }
+
+        function exportData() {
+            const data = { days: getDays(), hotels: getHotels(), transport: getTransport(), exportedAt: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `travelplan-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function openFirebaseSettings() {
+            const config = getSavedFirebaseConfig();
+            const isDefault = config.projectId === DEFAULT_FIREBASE_CONFIG.projectId;
+            document.getElementById('configDetails').innerHTML = `
+                <div class="flex items-center gap-2"><i class="fas fa-project-diagram text-indigo-500"></i><span>${config.projectId}</span></div>
+                <div class="flex items-center gap-2"><i class="fas fa-circle ${isOnline ? 'text-green-500' : 'text-red-500'}"></i><span>${isOnline ? 'Connected' : 'Disconnected'}</span></div>
+                <div class="flex items-center gap-2"><i class="fas fa-tag text-amber-500"></i><span>${isDefault ? 'Default Config' : 'Custom Config'}</span></div>`;
+            document.getElementById('firebaseSettingsModal').classList.add('active');
+        }
+
+        function closeFirebaseSettings() { document.getElementById('firebaseSettingsModal').classList.remove('active'); }
+        function reconfigureFirebase() { closeFirebaseSettings(); document.getElementById('firebaseConfigModal').classList.add('active'); }
+        function resetToDefaultConfig() { if (confirm('Reset to default?')) { saveFirebaseConfig(DEFAULT_FIREBASE_CONFIG); location.reload(); } }
+        async function clearAllData() { if (confirm('Clear ALL data?')) { await database.ref('/').remove(); closeFirebaseSettings(); } }
+
+        async function loadSampleData() {
+            if (!confirm('Load sample data?')) return;
+            showLoading('Loading sample data...');
+
+            const hotels = [
+                { id: 'h1', name: 'Hotel Le Marais', city: 'Paris', address: '23 Rue des Archives', checkIn: '2024-06-15', checkOut: '2024-06-18', reference: 'PAR-12345' },
+                { id: 'h2', name: 'Hotel Helvetia', city: 'Zurich', address: 'Stauffacherquai 1', checkIn: '2024-06-18', checkOut: '2024-06-20', reference: 'ZUR-67890' },
+                { id: 'h3', name: 'Hotel Milano Centrale', city: 'Milan', address: 'Via Pirelli 5', checkIn: '2024-06-20', checkOut: '2024-06-22', reference: 'MIL-11111' }
+            ];
+
+            const transports = [
+                { id: 't1', date: '2024-06-15', from: 'London', to: 'Paris', type: 'train', departureTime: '08:00', arrivalTime: '11:20', seat: 'Coach 6, Seat 42', reference: 'EUR-9876' },
+                { id: 't2', date: '2024-06-18', from: 'Paris', to: 'Zurich', type: 'train', departureTime: '10:22', arrivalTime: '14:31', seat: 'Car 12, Seat 61', reference: 'TGV-5432' },
+                { id: 't3', date: '2024-06-20', from: 'Zurich', to: 'Milan', type: 'train', departureTime: '09:40', arrivalTime: '13:10', seat: 'Car 4, Seat 25', reference: 'EC-7654' },
+                { id: 't4', date: '2024-06-22', from: 'Milan', to: 'London', type: 'flight', departureTime: '16:30', arrivalTime: '17:45', seat: '14F', reference: 'BA573' }
+            ];
+
+            const days = [
+                { id: 'd1', date: '2024-06-15', city: 'Paris', hotelId: 'h1', transportIds: ['t1'], activities: ['Arrive at Gare du Nord', 'Check into hotel', 'Explore Le Marais', 'Dinner at local bistro'], notes: 'First day - take it easy', images: [], documents: [] },
+                { id: 'd2', date: '2024-06-16', city: 'Paris', hotelId: 'h1', transportIds: [], activities: ['Eiffel Tower visit', 'Louvre Museum', 'Seine River cruise'], notes: 'Book Louvre tickets', images: [], documents: [] },
+                { id: 'd3', date: '2024-06-17', city: 'Paris', hotelId: 'h1', transportIds: [], activities: ['Montmartre & Sacré-Cœur', 'Notre-Dame area', 'Latin Quarter'], notes: '', images: [], documents: [] },
+                { id: 'd4', date: '2024-06-18', city: 'Zurich', hotelId: 'h2', transportIds: ['t2'], activities: ['Train to Zurich', 'Lake Zurich walk', 'Old Town stroll'], notes: 'Pack lunch for train', images: [], documents: [] },
+                { id: 'd5', date: '2024-06-19', city: 'Zurich', hotelId: 'h2', transportIds: [], activities: ['Swiss National Museum', 'Bahnhofstrasse shopping', 'Swiss fondue dinner'], notes: '', images: [], documents: [] },
+                { id: 'd6', date: '2024-06-20', city: 'Milan', hotelId: 'h3', transportIds: ['t3'], activities: ['Scenic train via Alps', 'Milan Cathedral', 'Galleria Vittorio'], notes: 'Enjoy mountain views!', images: [], documents: [] },
+                { id: 'd7', date: '2024-06-21', city: 'Milan', hotelId: 'h3', transportIds: [], activities: ['The Last Supper', 'Sforza Castle', 'Brera District', 'Aperitivo in Navigli'], notes: 'Last Supper at 10:30 AM', images: [], documents: [] },
+                { id: 'd8', date: '2024-06-22', city: 'Milan → London', hotelId: null, transportIds: ['t4'], activities: ['Morning espresso', 'Last shopping', 'Flight home'], notes: 'Checkout by 11 AM', images: [], documents: [] }
+            ];
+
+            for (const h of hotels) await saveHotel(h);
+            for (const t of transports) await saveTransport(t);
+            for (const d of days) await saveDay(d);
+
+            hideLoading();
+            closeFirebaseSettings();
+        }
+
+        // 🇨🇭🇮🇹 Alpine Romance Route - 10 Days Data Migration
+        async function loadAlpineRomanceData() {
+            if (!confirm('🇨🇭🇮🇹 Load "Alpine Romance" 10-Day Trip?\n\nGeneva → Montreux → Interlaken → Lucerne → Milan → Lake Como\n\nDates: Jan 1-10, 2026\n\nThis will CLEAR existing data and load the complete Alpine itinerary.')) return;
+            
+            // Check if database is connected
+            if (!database) {
+                alert('Database not connected. Please wait for connection.');
+                return;
+            }
+            
+            showLoading('Loading Alpine Romance itinerary...');
+
+            // ==================== HOTELS ====================
+            const hotels = [
+                { 
+                    id: 'alpine-h1', 
+                    name: 'MEININGER Hotel Genève Centre Charmilles', 
+                    city: 'Geneva', 
+                    address: 'Near Cornavin Station, Geneva, Switzerland',
+                    checkIn: '2026-01-01', 
+                    checkOut: '2026-01-02', 
+                    reference: 'GVA-2026-001',
+                    contact: 'Ensure hotel provides Free Geneva Transport Card',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-h2', 
+                    name: 'Hotel Villa Toscane', 
+                    city: 'Montreux', 
+                    address: 'Opposite Montreux Train Station/Casino, 1820 Montreux, Switzerland',
+                    checkIn: '2026-01-02', 
+                    checkOut: '2026-01-03', 
+                    reference: 'MTX-2026-002',
+                    contact: 'Ask for Lake View room if budget allows. Hotel provides Montreux Riviera Card.',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-h3', 
+                    name: 'Backpackers Villa Sonnenhof', 
+                    city: 'Interlaken', 
+                    address: 'Near Interlaken Ost, 3800 Interlaken, Switzerland',
+                    checkIn: '2026-01-03', 
+                    checkOut: '2026-01-06', 
+                    reference: 'INT-2026-003',
+                    contact: 'Book PRIVATE DOUBLE ROOM with Ensuite. Includes free entry to local swimming pool.',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-h4', 
+                    name: 'Hotel Luzernerhof', 
+                    city: 'Lucerne', 
+                    address: 'Old Town, near the lake, 6003 Luzern, Switzerland',
+                    checkIn: '2026-01-06', 
+                    checkOut: '2026-01-08', 
+                    reference: 'LUZ-2026-004',
+                    contact: 'Located in Old Town, near Chapel Bridge',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-h5', 
+                    name: 'B&B Hotel Milano Central Station', 
+                    city: 'Milan', 
+                    address: 'Near Milano Centrale, Piazza Duca d\'Aosta, 20124 Milano, Italy',
+                    checkIn: '2026-01-08', 
+                    checkOut: '2026-01-10', 
+                    reference: 'MIL-2026-005',
+                    contact: 'Essential location near train station for ease of travel',
+                    pdfId: null
+                }
+            ];
+
+            // ==================== TRANSPORT ====================
+            const transports = [
+                // Day 1: Airport to City
+                { 
+                    id: 'alpine-t1', 
+                    date: '2026-01-01', 
+                    from: 'Geneva Airport (Genève-Aéroport)', 
+                    to: 'Geneva City (Genève Cornavin)', 
+                    type: 'train', 
+                    departureTime: '14:00', 
+                    arrivalTime: '14:15', 
+                    seat: 'No reservation needed',
+                    reference: 'FREE TICKET',
+                    notes: '🎫 FREE! Get ticket from machine in baggage claim hall (left side before customs). Runs every 10-15 mins.',
+                    pdfId: null
+                },
+                // Day 2: Geneva to Montreux
+                { 
+                    id: 'alpine-t2', 
+                    date: '2026-01-02', 
+                    from: 'Geneva (Genève)', 
+                    to: 'Montreux', 
+                    type: 'train', 
+                    departureTime: '09:30', 
+                    arrivalTime: '10:30', 
+                    seat: 'Sit on RIGHT side for lake views',
+                    reference: 'IR90 InterRegio',
+                    notes: '🚂 Book on SBB Mobile App 1-2 days before. Select "Half Fare". ~15 CHF (£14) pp. Direct train ~1 hour.',
+                    pdfId: null
+                },
+                // Day 3: GoldenPass Express
+                { 
+                    id: 'alpine-t3', 
+                    date: '2026-01-03', 
+                    from: 'Montreux', 
+                    to: 'Interlaken Ost', 
+                    type: 'train', 
+                    departureTime: '09:35', 
+                    arrivalTime: '12:50', 
+                    seat: 'MUST BOOK seat at gpx.swiss (~£18 pp)',
+                    reference: 'GoldenPass Express (GPX)',
+                    notes: '🔴 BOOK SEAT NOW at gpx.swiss! Buy ticket on SBB App with "Half Fare" (~£16 pp). Total ~£34 pp. Take DIRECT train, NOT the one stopping at Zweisimmen.',
+                    pdfId: null
+                },
+                // Day 4: Lauterbrunnen
+                { 
+                    id: 'alpine-t4', 
+                    date: '2026-01-04', 
+                    from: 'Interlaken Ost', 
+                    to: 'Lauterbrunnen', 
+                    type: 'train', 
+                    departureTime: '09:00', 
+                    arrivalTime: '09:20', 
+                    seat: 'No reservation needed',
+                    reference: 'Regional Train',
+                    notes: '🏔️ 20 min ride. Then cable car Lauterbrunnen → Grütschalp → Train to Mürren.',
+                    pdfId: null
+                },
+                // Day 5: Grindelwald
+                { 
+                    id: 'alpine-t5', 
+                    date: '2026-01-05', 
+                    from: 'Interlaken Ost', 
+                    to: 'Grindelwald Terminal', 
+                    type: 'train', 
+                    departureTime: '09:00', 
+                    arrivalTime: '09:35', 
+                    seat: 'No reservation needed',
+                    reference: 'BOB Train',
+                    notes: '🎿 Eiger Express gondola to Eigergletscher available (50% off with Swiss Pass). First Cliff Walk also recommended.',
+                    pdfId: null
+                },
+                // Day 6: Interlaken to Lucerne
+                { 
+                    id: 'alpine-t6', 
+                    date: '2026-01-06', 
+                    from: 'Interlaken Ost', 
+                    to: 'Luzern', 
+                    type: 'train', 
+                    departureTime: '09:04', 
+                    arrivalTime: '11:00', 
+                    seat: 'Sit on LEFT side for Lake Brienz views',
+                    reference: 'Luzern-Interlaken Express',
+                    notes: '🚂 Buy on SBB App with "Half Fare". ~17 CHF (£15) pp. No reservation needed. Scenic route!',
+                    pdfId: null
+                },
+                // Day 7: Lucerne to Engelberg (Titlis)
+                { 
+                    id: 'alpine-t7a', 
+                    date: '2026-01-07', 
+                    from: 'Luzern', 
+                    to: 'Engelberg', 
+                    type: 'train', 
+                    departureTime: '08:10', 
+                    arrivalTime: '08:53', 
+                    seat: 'No reservation needed',
+                    reference: 'IR InterRegio',
+                    notes: '🏔️ Buy on SBB App with "Half Fare". ~10 CHF (£9) pp one way. Mount Titlis gondola: ~£50 pp (50% off with Swiss Pass).',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-t7b', 
+                    date: '2026-01-07', 
+                    from: 'Engelberg', 
+                    to: 'Luzern', 
+                    type: 'train', 
+                    departureTime: '13:00', 
+                    arrivalTime: '13:43', 
+                    seat: 'No reservation needed',
+                    reference: 'IR InterRegio',
+                    notes: '🚂 Return journey. Then enjoy free boat cruise on Lake Lucerne with Swiss Pass.',
+                    pdfId: null
+                },
+                // Day 8: Lucerne to Milan
+                { 
+                    id: 'alpine-t8', 
+                    date: '2026-01-08', 
+                    from: 'Luzern', 
+                    to: 'Milano Centrale', 
+                    type: 'train', 
+                    departureTime: '09:18', 
+                    arrivalTime: '13:00', 
+                    seat: 'Book seat recommended',
+                    reference: 'IR + EuroCity (via Arth-Goldau)',
+                    notes: '🔴 BOOK EARLY on SBB.ch! Change at Arth-Goldau (09:48). Goes through Gotthard Base Tunnel. ~£30-40 pp. Use "Half-Fare travelcard" for discount.',
+                    pdfId: null
+                },
+                // Day 9: Lake Como Day Trip
+                { 
+                    id: 'alpine-t9a', 
+                    date: '2026-01-09', 
+                    from: 'Milano Centrale', 
+                    to: 'Varenna-Esino', 
+                    type: 'train', 
+                    departureTime: '09:20', 
+                    arrivalTime: '10:20', 
+                    seat: 'No reservation needed',
+                    reference: 'RE RegioExpress',
+                    notes: '🏞️ Buy on Trenitalia App or station machine. ~€7.40 (£6.50) pp one way. Small station, no ticket office - use machine.',
+                    pdfId: null
+                },
+                { 
+                    id: 'alpine-t9b', 
+                    date: '2026-01-09', 
+                    from: 'Varenna-Esino', 
+                    to: 'Milano Centrale', 
+                    type: 'train', 
+                    departureTime: '17:35', 
+                    arrivalTime: '18:35', 
+                    seat: 'No reservation needed',
+                    reference: 'RE RegioExpress',
+                    notes: '🚂 Return to Milan. Then head to Navigli District for Aperitivo dinner!',
+                    pdfId: null
+                },
+                // Day 9: Varenna to Bellagio Ferry
+                { 
+                    id: 'alpine-t9c', 
+                    date: '2026-01-09', 
+                    from: 'Varenna', 
+                    to: 'Bellagio', 
+                    type: 'boat', 
+                    departureTime: '12:00', 
+                    arrivalTime: '12:15', 
+                    seat: 'No reservation needed',
+                    reference: 'Lake Como Ferry',
+                    notes: '⛴️ 15 min scenic ferry across Lake Como. Buy ticket at Varenna pier.',
+                    pdfId: null
+                },
+                // Day 10: Airport Transfer
+                { 
+                    id: 'alpine-t10', 
+                    date: '2026-01-10', 
+                    from: 'Milano Centrale', 
+                    to: 'Malpensa Aeroporto T1', 
+                    type: 'train', 
+                    departureTime: '12:00', 
+                    arrivalTime: '12:52', 
+                    seat: 'No reservation needed',
+                    reference: 'Malpensa Express (XP)',
+                    notes: '✈️ Buy at station or Trenitalia App. ~€13 (£11) pp. Arrive 3.5 hours before flight. Check your terminal!',
+                    pdfId: null
+                }
+            ];
+
+            // ==================== DAYS ====================
+            const days = [
+                // DAY 1 - Geneva Arrival
+                { 
+                    id: 'alpine-d1', 
+                    date: '2026-01-01', 
+                    city: 'Geneva 🇨🇭', 
+                    hotelId: 'alpine-h1', 
+                    transportIds: ['alpine-t1'], 
+                    activities: [
+                        '✈️ 13:15 - Land at Geneva Airport',
+                        '🎫 14:00 - Pick up FREE Geneva Transport Card from machine in baggage claim',
+                        '🚂 14:00 - Train to Geneva Cornavin (City Centre)',
+                        '🏨 14:30 - Check-in at MEININGER Hotel',
+                        '🚶 15:30 - Walk Lake Geneva Promenade',
+                        '⛲ See the Jet d\'Eau (huge fountain) and Flower Clock',
+                        '🏛️ 17:00 - Explore Old Town (Vieille Ville) - quiet & atmospheric on New Year\'s Day',
+                        '🧀 Dinner: Bains des Pâquis "Buvette" - Best budget Fondue in Geneva (~25 CHF pp)'
+                    ],
+                    notes: '⚠️ PUBLIC HOLIDAY - Shops closed, but restaurants & transport running. New Year\'s Day atmosphere!',
+                    images: [],
+                    documents: []
+                },
+                // DAY 2 - Geneva to Montreux
+                { 
+                    id: 'alpine-d2', 
+                    date: '2026-01-02', 
+                    city: 'Montreux 🇨🇭', 
+                    hotelId: 'alpine-h2', 
+                    transportIds: ['alpine-t2'], 
+                    activities: [
+                        '🚂 09:30 - Train Geneva → Montreux (Sit RIGHT side for lake views!)',
+                        '🏨 11:00 - Check-in at Hotel Villa Toscane (drop bags)',
+                        '🚶 12:00 - Walk flower-lined lakeside promenade',
+                        '🎤 See Freddie Mercury Statue',
+                        '🚌 13:30 - Bus to Chillon Castle (free with Montreux Riviera Card from hotel)',
+                        '🏰 14:30 - Visit Chillon Castle inside (~£13 pp) - Switzerland\'s most beautiful historic building',
+                        '🍺 Dinner: Barrel Oak (Irish pub with good food/views) or promenade café'
+                    ],
+                    notes: 'Direct train ~1 hour. Montreux Riviera Card from hotel gives free local transport!',
+                    images: [],
+                    documents: []
+                },
+                // DAY 3 - GoldenPass to Interlaken
+                { 
+                    id: 'alpine-d3', 
+                    date: '2026-01-03', 
+                    city: 'Interlaken 🇨🇭', 
+                    hotelId: 'alpine-h3', 
+                    transportIds: ['alpine-t3'], 
+                    activities: [
+                        '🚂 09:35 - Board GoldenPass Express (MUST have seat reservation!)',
+                        '🏔️ Scenic journey through Swiss Alps',
+                        '🚉 12:50 - Arrive Interlaken Ost',
+                        '🏨 13:30 - Check-in at Backpackers Villa Sonnenhof',
+                        '🪂 15:00 - Walk around Höhematte park - watch paragliders land!',
+                        '🌅 16:30 - Local bus to Lake Brienz for sunset views',
+                        '🍺 Dinner: Hüsi Bierhaus (Hearty Swiss food)'
+                    ],
+                    notes: '🔴 BOOK SEAT at gpx.swiss! Take DIRECT train only (NOT via Zweisimmen). Total ~£34 pp for seat + ticket.',
+                    images: [],
+                    documents: []
+                },
+                // DAY 4 - Lauterbrunnen & Mürren
+                { 
+                    id: 'alpine-d4', 
+                    date: '2026-01-04', 
+                    city: 'Lauterbrunnen & Mürren 🇨🇭', 
+                    hotelId: 'alpine-h3', 
+                    transportIds: ['alpine-t4'], 
+                    activities: [
+                        '🚂 09:00 - Train Interlaken Ost → Lauterbrunnen (20 min)',
+                        '💦 09:30 - Walk the valley floor, see Staubbach Falls',
+                        '🚡 11:00 - Cable car Lauterbrunnen → Grütschalp, then train to Mürren',
+                        '🍽️ 12:00 - Lunch in Mürren (car-free cliff village - BETTER views than Interlaken!)',
+                        '🥾 14:00 - Walk winter hiking paths in Mürren',
+                        '🚂 16:00 - Train/Cable car back to Interlaken',
+                        '🍽️ Dinner: Layaly Beirut (Lebanese) or Little Thai - budget favorites in Interlaken'
+                    ],
+                    notes: 'Mürren is a hidden gem! Car-free village on cliff edge with stunning mountain panorama.',
+                    images: [],
+                    documents: []
+                },
+                // DAY 5 - Grindelwald
+                { 
+                    id: 'alpine-d5', 
+                    date: '2026-01-05', 
+                    city: 'Grindelwald 🇨🇭', 
+                    hotelId: 'alpine-h3', 
+                    transportIds: ['alpine-t5'], 
+                    activities: [
+                        '🚂 09:00 - Train Interlaken Ost → Grindelwald Terminal',
+                        '🚡 10:00 - Eiger Express gondola to Eigergletscher (50% off with Swiss Pass) OR explore Grindelwald village',
+                        '🍽️ 12:00 - Lunch at slope-side restaurant watching skiers',
+                        '🌉 14:00 - First Cliff Walk (metal walkway on cliff!) - if budget allows for First Gondola (50% off)',
+                        '🏔️ Enjoy Eiger mountain views',
+                        '🚂 Return to Interlaken',
+                        '🍽️ Dinner in Interlaken'
+                    ],
+                    notes: 'The Eiger Express and First Cliff Walk are incredible! 50% discount with Swiss Travel Pass.',
+                    images: [],
+                    documents: []
+                },
+                // DAY 6 - Interlaken to Lucerne
+                { 
+                    id: 'alpine-d6', 
+                    date: '2026-01-06', 
+                    city: 'Lucerne 🇨🇭', 
+                    hotelId: 'alpine-h4', 
+                    transportIds: ['alpine-t6'], 
+                    activities: [
+                        '🚂 09:04 - Board Luzern-Interlaken Express (Sit LEFT for Lake Brienz views!)',
+                        '🏔️ Scenic journey along lakes and mountains',
+                        '🚉 11:00 - Arrive Lucerne',
+                        '🏨 Check-in at Hotel Luzernerhof',
+                        '🌉 13:00 - Walk the Chapel Bridge (Kapellbrücke) - iconic covered wooden bridge',
+                        '🦁 14:30 - Visit the Lion Monument (dying lion carved in rock)',
+                        '🏰 16:00 - Explore Musegg Wall towers (panoramic city views)',
+                        '🍽️ Dinner: Manora Restaurant (top floor Manor dept store) - BUDGET SECRET: Fresh pasta/grill, amazing rooftop view, cheap for Swiss!'
+                    ],
+                    notes: 'No reservation needed. ~£15 pp. Lucerne is absolutely beautiful!',
+                    images: [],
+                    documents: []
+                },
+                // DAY 7 - Mount Titlis
+                { 
+                    id: 'alpine-d7', 
+                    date: '2026-01-07', 
+                    city: 'Mount Titlis & Lucerne 🇨🇭', 
+                    hotelId: 'alpine-h4', 
+                    transportIds: ['alpine-t7a', 'alpine-t7b'], 
+                    activities: [
+                        '🚂 08:10 - Train Lucerne → Engelberg (43 min)',
+                        '🚡 09:00 - Gondola up to Mount Titlis (3,020m!) - ~£50 pp with Swiss Pass 50% off',
+                        '🌨️ 10:00 - Experience the Rotating Cable Car (world\'s first!)',
+                        '❄️ Explore Glacier Cave (walk inside a glacier!)',
+                        '🌉 Cross the Cliff Walk suspension bridge',
+                        '🚂 13:00 - Return to Lucerne',
+                        '⛴️ 15:00 - Relaxing boat cruise on Lake Lucerne (FREE with Swiss Travel Pass)',
+                        '🍺 Dinner: Rathaus Brauerei (riverside, traditional Swiss food & local beer)'
+                    ],
+                    notes: 'Mount Titlis is INCREDIBLE! Rotating cable car, glacier cave, and cliff walk. Don\'t miss the free boat cruise!',
+                    images: [],
+                    documents: []
+                },
+                // DAY 8 - Lucerne to Milan
+                { 
+                    id: 'alpine-d8', 
+                    date: '2026-01-08', 
+                    city: 'Milan 🇮🇹', 
+                    hotelId: 'alpine-h5', 
+                    transportIds: ['alpine-t8'], 
+                    activities: [
+                        '🚂 09:18 - Train Lucerne → Arth-Goldau (20 min)',
+                        '🚂 09:48 - Change to EuroCity train: Arth-Goldau → Milano Centrale',
+                        '🚇 Train goes through Gotthard Base Tunnel (world\'s longest!)',
+                        '🚉 13:00 - Arrive Milan',
+                        '🏨 Check-in at B&B Hotel Milano Central Station',
+                        '🚇 15:00 - Metro to Duomo',
+                        '⛪ Visit Milan Cathedral (Duomo) - stunning Gothic architecture',
+                        '🛍️ Explore Galleria Vittorio Emanuele II (beautiful shopping arcade)',
+                        '☕ 17:00 - Visit Starbucks Reserve Roastery (it\'s a palace of coffee, very romantic!)',
+                        '🍕 Dinner: Spontini (famous thick pizza) near Duomo'
+                    ],
+                    notes: '🔴 BOOK EARLY! ~£30-40 pp. Swiss Pass covers to border, need Italian ticket for rest. Show conductor Pass for first half, Italian ticket for second half.',
+                    images: [],
+                    documents: []
+                },
+                // DAY 9 - Lake Como
+                { 
+                    id: 'alpine-d9', 
+                    date: '2026-01-09', 
+                    city: 'Lake Como (Varenna & Bellagio) 🇮🇹', 
+                    hotelId: 'alpine-h5', 
+                    transportIds: ['alpine-t9a', 'alpine-t9c', 'alpine-t9b'], 
+                    activities: [
+                        '⚠️ TIP: Do NOT go to Como town - go to the "Golden Triangle" instead!',
+                        '🚂 09:20 - Train Milan Centrale → Varenna-Esino (1 hr, ~£6.50 pp)',
+                        '❤️ 10:30 - Walk the "Walk of Lovers" (red fenced path) along lake in Varenna',
+                        '⛴️ 12:00 - Ferry Varenna → Bellagio (15 min scenic crossing)',
+                        '🍝 12:30 - Romantic lunch in Bellagio (try La Fontana)',
+                        '🚶 14:30 - Explore Bellagio\'s steep cobbled stairs and boutiques',
+                        '⛴️ 16:00 - Ferry back to Varenna',
+                        '🚂 17:35 - Train Varenna → Milan Centrale',
+                        '🍷 Dinner: Navigli District - Have "Aperitivo" (buy a drink, eat from the buffet!)'
+                    ],
+                    notes: 'Lake Como is MAGICAL! The "Walk of Lovers" and Bellagio are incredibly romantic. Navigli Aperitivo is the Italian way - one drink = free buffet dinner!',
+                    images: [],
+                    documents: []
+                },
+                // DAY 10 - Departure
+                { 
+                    id: 'alpine-d10', 
+                    date: '2026-01-10', 
+                    city: 'Milan → Home ✈️', 
+                    hotelId: null, 
+                    transportIds: ['alpine-t10'], 
+                    activities: [
+                        '☕ Morning coffee and croissant at a local café',
+                        '🛍️ Last-minute shopping if time permits',
+                        '🏨 Checkout by 11 AM',
+                        '🚂 Take Malpensa Express from Milano Centrale → Airport (~£11 pp)',
+                        '✈️ Fly home to UK',
+                        '💕 End of an amazing Alpine Romance adventure!'
+                    ],
+                    notes: 'Arrive at station 3.5 hours before flight. Check your terminal (T1 or T2)! Malpensa Express goes to T1.',
+                    images: [],
+                    documents: []
+                }
+            ];
+
+            try {
+                // Clear existing data first for clean slate
+                await database.ref('days').remove();
+                await database.ref('hotels').remove();
+                await database.ref('transport').remove();
+                
+                console.log('Cleared existing data, now inserting Alpine Romance data...');
+
+                // Insert all hotels
+                for (const hotel of hotels) {
+                    await database.ref('hotels/' + hotel.id).set(hotel);
+                    console.log('Added hotel:', hotel.name);
+                }
+                
+                // Insert all transport
+                for (const transport of transports) {
+                    await database.ref('transport/' + transport.id).set(transport);
+                    console.log('Added transport:', transport.from, '→', transport.to);
+                }
+                
+                // Insert all days
+                for (const day of days) {
+                    await database.ref('days/' + day.id).set(day);
+                    console.log('Added day:', day.date, day.city);
+                }
+
+                hideLoading();
+                closeFirebaseSettings();
+                
+                // Show success message
+                alert('🎉 Alpine Romance Trip Loaded Successfully!\n\n🇨🇭🇮🇹 10 Days of Adventure:\n• 5 Hotels\n• 14 Transport bookings\n• 10 Day itineraries\n\nGeneva → Montreux → Interlaken → Lucerne → Milan → Lake Como\n\nJan 1-10, 2026\n\nData is now synced to Firebase!');
+                
+                // Force refresh the UI
+                renderAll();
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Error loading Alpine Romance data:', error);
+                alert('Error loading data: ' + error.message);
+            }
+        }
+
+        // ==================== INIT ====================
+        async function init() {
+            const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            if (settings.darkMode) document.documentElement.classList.add('dark');
+
+            const config = getSavedFirebaseConfig();
+            showLoading('Connecting...');
+            
+            try {
+                await initFirebase(config);
+            } catch (error) {
+                hideLoading();
+                document.getElementById('firebaseConfigModal').classList.add('active');
+            }
+
+            addActivityInput();
+            switchTab('dashboard');
+        }
+
+        init();
+    </script>
+</body>
+</html>
