@@ -1715,7 +1715,7 @@
                     const hotel = hotels.find(h => h.id === day.hotelId);
                     const date = new Date(day.date);
                     return `
-                        <div class="upcoming-item" onclick="switchTab('itinerary')">
+                        <div class="upcoming-item" onclick="goToDay('${day.id}')">
                             <div class="upcoming-date">
                                 <span class="month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
                                 <span class="day">${date.getDate()}</span>
@@ -1749,6 +1749,60 @@
             }
         }
 
+        function toggleDay(id) {
+            const content = document.getElementById(`day-content-${id}`);
+            const chevron = document.getElementById(`chevron-${id}`);
+            const header = document.getElementById(`day-header-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                // Open
+                content.classList.remove('hidden');
+                // Small animation delay to allow display:block to apply before opacity
+                requestAnimationFrame(() => {
+                    content.classList.remove('opacity-0', '-translate-y-2');
+                });
+                chevron.style.transform = 'rotate(180deg)';
+                header.classList.add('rounded-b-none');
+            } else {
+                // Close
+                content.classList.add('opacity-0', '-translate-y-2');
+                // Wait for transition to finish before hiding (approximate)
+                setTimeout(() => {
+                    content.classList.add('hidden');
+                }, 200);
+                chevron.style.transform = 'rotate(0deg)';
+                header.classList.remove('rounded-b-none');
+            }
+        }
+
+        function goToDay(dayId) {
+            // 1. Reset search to ensure day is visible
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = '';
+                filterItems();
+            }
+
+            // 2. Switch Tab
+            switchTab('itinerary');
+
+            // 3. Scroll and Expand (small delay to ensure DOM is ready/visible)
+            setTimeout(() => {
+                const dayHeader = document.getElementById(`day-header-${dayId}`);
+                const dayContent = document.getElementById(`day-content-${dayId}`);
+                
+                if (dayHeader && dayContent) {
+                    // Scroll into view
+                    dayHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Expand if currently hidden
+                    if (dayContent.classList.contains('hidden')) {
+                        toggleDay(dayId);
+                    }
+                }
+            }, 100);
+        }
+
         function renderItinerary() {
             const container = document.getElementById('itineraryContainer');
             const days = getDays();
@@ -1774,7 +1828,8 @@
                     <div class="timeline-item">
                         <div class="timeline-dot"></div>
                         <div class="card overflow-hidden">
-                            <div class="day-header">
+                            <!-- Header (Clickable) -->
+                            <div id="day-header-${day.id}" class="day-header cursor-pointer transition-all duration-200 hover:bg-opacity-80" onclick="toggleDay('${day.id}')">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <div class="text-sm font-semibold text-[var(--primary)] mb-1">${formatDate(day.date)}</div>
@@ -1782,59 +1837,69 @@
                                             <i class="fa-solid fa-location-dot text-[var(--secondary)]"></i>
                                             ${day.city}
                                         </h3>
+                                        ${hotel ? `<div class="text-xs text-[var(--text-secondary)] mt-1"><i class="fa-solid fa-bed mr-1"></i>${hotel.name}</div>` : ''}
                                     </div>
-                                    <div class="flex gap-1">
-                                        <button onclick="editDay('${day.id}')" class="action-btn"><i class="fa-solid fa-pen"></i></button>
-                                        <button onclick="deleteDay('${day.id}')" class="action-btn danger"><i class="fa-solid fa-trash"></i></button>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex gap-1" onclick="event.stopPropagation()">
+                                            <button onclick="editDay('${day.id}')" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                                            <button onclick="deleteDay('${day.id}')" class="action-btn danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                        </div>
+                                        <div class="w-8 h-8 flex items-center justify-center rounded-full bg-white/20">
+                                            <i id="chevron-${day.id}" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-5">
-                                ${hotel ? `
-                                    <div class="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl mb-4">
-                                        <i class="fa-solid fa-hotel text-xl text-[var(--primary)]"></i>
-                                        <div>
-                                            <div class="font-bold">${hotel.name}</div>
-                                            <div class="text-sm text-[var(--text-secondary)]">${hotel.address || hotel.city}</div>
-                                        </div>
-                                    </div>` : ''}
+                            
+                            <!-- Content (Collapsible) -->
+                            <div id="day-content-${day.id}" class="hidden opacity-0 -translate-y-2 transition-all duration-200 border-t border-[var(--border-color)]">
+                                <div class="p-5">
+                                    ${hotel ? `
+                                        <div class="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl mb-4">
+                                            <i class="fa-solid fa-hotel text-xl text-[var(--primary)]"></i>
+                                            <div>
+                                                <div class="font-bold">${hotel.name}</div>
+                                                <div class="text-sm text-[var(--text-secondary)]">${hotel.address || hotel.city}</div>
+                                            </div>
+                                        </div>` : ''}
 
-                                ${dayTransports.length > 0 ? `
-                                    <div class="space-y-3 mb-4">
-                                        ${dayTransports.map(t => `
-                                            <div class="transport-card ${t.type} card p-4">
-                                                <div class="flex items-center gap-3">
-                                                    <i class="fa-solid ${getTransportIcon(t.type)} text-xl"></i>
-                                                    <div class="flex-1">
-                                                        <div class="font-bold">${t.from} → ${t.to}</div>
-                                                        <div class="text-sm text-[var(--text-secondary)]">${t.departureTime} - ${t.arrivalTime}</div>
+                                    ${dayTransports.length > 0 ? `
+                                        <div class="space-y-3 mb-4">
+                                            ${dayTransports.map(t => `
+                                                <div class="transport-card ${t.type} card p-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <i class="fa-solid ${getTransportIcon(t.type)} text-xl"></i>
+                                                        <div class="flex-1">
+                                                            <div class="font-bold">${t.from} → ${t.to}</div>
+                                                            <div class="text-sm text-[var(--text-secondary)]">${t.departureTime} - ${t.arrivalTime}</div>
+                                                        </div>
+                                                        <span class="transport-badge transport-${t.type} capitalize">${t.type}</span>
                                                     </div>
-                                                    <span class="transport-badge transport-${t.type} capitalize">${t.type}</span>
-                                                </div>
-                                            </div>`).join('')}
-                                    </div>` : ''}
+                                                </div>`).join('')}
+                                        </div>` : ''}
 
-                                ${(day.activities || []).length > 0 ? `
-                                    <div class="mb-4">
-                                        <div class="section-title">Activities</div>
-                                        ${day.activities.map(a => `
-                                            <div class="activity-item">
-                                                <i class="fa-solid fa-circle"></i>
-                                                <span>${a}</span>
-                                            </div>`).join('')}
-                                    </div>` : ''}
+                                    ${(day.activities || []).length > 0 ? `
+                                        <div class="mb-4">
+                                            <div class="section-title">Activities</div>
+                                            ${day.activities.map(a => `
+                                                <div class="activity-item">
+                                                    <i class="fa-solid fa-circle"></i>
+                                                    <span>${a}</span>
+                                                </div>`).join('')}
+                                        </div>` : ''}
 
-                                ${day.notes ? `
-                                    <div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-sm">
-                                        <i class="fa-solid fa-sticky-note text-amber-500 mr-2"></i>
-                                        ${day.notes}
-                                    </div>` : ''}
+                                    ${day.notes ? `
+                                        <div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-sm">
+                                            <i class="fa-solid fa-sticky-note text-amber-500 mr-2"></i>
+                                            ${day.notes}
+                                        </div>` : ''}
 
-                                ${(day.images && day.images.length) || (day.documents && day.documents.length) ? `
-                                    <div class="flex gap-3 mt-4 pt-4 border-t border-[var(--border-color)]">
-                                        ${day.images?.length ? `<button onclick="showGallery('${day.id}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-images"></i> ${day.images.length} images</button>` : ''}
-                                        ${day.documents?.length ? `<button onclick="showDocuments('${day.id}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-file-pdf"></i> ${day.documents.length} docs</button>` : ''}
-                                    </div>` : ''}
+                                    ${(day.images && day.images.length) || (day.documents && day.documents.length) ? `
+                                        <div class="flex gap-3 mt-4 pt-4 border-t border-[var(--border-color)]">
+                                            ${day.images?.length ? `<button onclick="showGallery('${day.id}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-images"></i> ${day.images.length} images</button>` : ''}
+                                            ${day.documents?.length ? `<button onclick="showDocuments('${day.id}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-file-pdf"></i> ${day.documents.length} docs</button>` : ''}
+                                        </div>` : ''}
+                                </div>
                             </div>
                         </div>
                     </div>`;
