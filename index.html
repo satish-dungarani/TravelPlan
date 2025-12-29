@@ -21,6 +21,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
+    <!-- PDF.js Library for PDF Viewing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <!-- Flatpickr Date Picker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     <style>
         /* HD Quality Font Import */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -47,9 +58,9 @@
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
             --border-color: #e2e8f0;
-            --sidebar-width: 280px;
-            --header-height: 64px;
-            --bottom-nav-height: 70px;
+            --sidebar-width: 240px;
+            --header-height: 56px;
+            --bottom-nav-height: 60px;
         }
 
         .dark {
@@ -97,35 +108,35 @@
         }
 
         .sidebar-header {
-            padding: 28px 24px;
+            padding: 16px 18px;
             border-bottom: 1px solid rgba(255,255,255,0.12);
         }
 
         .sidebar-logo {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
-            border-radius: 14px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 14px 24px;
+            gap: 10px;
+            padding: 10px 18px;
             color: rgba(255,255,255,0.7);
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 500;
-            border-left: 4px solid transparent;
-            margin: 2px 0;
+            border-left: 3px solid transparent;
+            margin: 1px 0;
             letter-spacing: 0.01em;
         }
 
@@ -142,19 +153,19 @@
         }
 
         .nav-item i {
-            width: 22px;
+            width: 18px;
             text-align: center;
-            font-size: 17px;
+            font-size: 14px;
             opacity: 0.9;
         }
 
         .nav-section {
-            padding: 24px 24px 10px;
-            font-size: 11px;
+            padding: 16px 18px 6px;
+            font-size: 10px;
             font-weight: 700;
             color: rgba(255,255,255,0.4);
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
         }
 
         /* Main Content */
@@ -174,10 +185,10 @@
             height: var(--header-height);
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             z-index: 90;
-            padding: 0 20px;
+            padding: 0 16px;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
         }
 
         /* Bottom Navigation */
@@ -191,7 +202,7 @@
             background: var(--bg-card);
             border-top: 1px solid var(--border-color);
             z-index: 90;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -200,7 +211,7 @@
             justify-content: space-around;
             align-items: center;
             height: 100%;
-            max-width: 500px;
+            max-width: 420px;
             margin: 0 auto;
         }
 
@@ -208,18 +219,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            padding: 10px 16px;
+            gap: 3px;
+            padding: 6px 12px;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            border-radius: 12px;
+            border-radius: 8px;
         }
 
         .bottom-nav-item i {
-            font-size: 20px;
+            font-size: 18px;
             transition: transform 0.2s ease;
         }
 
@@ -228,7 +239,7 @@
         }
 
         .bottom-nav-item.active i {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         /* Responsive */
@@ -279,8 +290,8 @@
 
         /* Stat Cards */
         .stat-card {
-            padding: 24px;
-            border-radius: 20px;
+            padding: 16px;
+            border-radius: 14px;
             color: white;
             position: relative;
             overflow: hidden;
@@ -303,30 +314,30 @@
         .stat-card.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
 
         .stat-icon {
-            width: 56px;
-            height: 56px;
+            width: 40px;
+            height: 40px;
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .stat-value {
-            font-size: 36px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1;
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
-            margin-top: 6px;
+            margin-top: 4px;
             font-weight: 500;
         }
 
@@ -500,12 +511,12 @@
         .sync-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-size: 12px;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.02em;
         }
 
         .sync-connected { background: rgba(16, 185, 129, 0.15); color: #10b981; }
@@ -513,17 +524,57 @@
         .sync-syncing { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
         .pulse-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: currentColor;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 8px currentColor;
+            box-shadow: 0 0 6px currentColor;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
         /* Loading */
@@ -587,18 +638,18 @@
         /* FAB */
         .fab {
             position: fixed;
-            bottom: calc(var(--bottom-nav-height) + 20px);
-            right: 20px;
-            width: 60px;
-            height: 60px;
+            bottom: calc(var(--bottom-nav-height) + 16px);
+            right: 16px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 18px;
+            border-radius: 14px;
             display: none;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+            font-size: 20px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
             cursor: pointer;
             z-index: 80;
             transition: all 0.3s ease;
@@ -728,33 +779,33 @@
         .quick-action {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 18px 20px;
+            gap: 12px;
+            padding: 12px 14px;
             background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-weight: 600;
-            font-size: 15px;
+            font-weight: 500;
+            font-size: 13px;
         }
 
         .quick-action:hover {
             border-color: var(--primary);
             background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
-            transform: translateX(4px);
+            transform: translateX(2px);
         }
 
         .quick-action i {
-            width: 44px;
-            height: 44px;
+            width: 34px;
+            height: 34px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
+            font-size: 14px;
         }
 
         /* Load Trip Banner */
@@ -793,28 +844,586 @@
         }
 
         .upcoming-date {
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 48px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 14px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
         .upcoming-date .month {
-            font-size: 10px;
-            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 700;
             letter-spacing: 0.5px;
-            opacity: 0.9;
+            line-height: 1.2;
         }
 
         .upcoming-date .day {
-            font-size: 20px;
+            font-size: 10px;
             line-height: 1;
+            opacity: 0.8;
+        }
+
+        /* File Upload Zone */
+        .file-upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        .file-upload-zone:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
+        }
+
+        .file-upload-zone.dragover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            transform: scale(1.02);
+        }
+
+        /* File Gallery */
+        .file-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .file-gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-gallery-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .file-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-gallery-item .pdf-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ef444415 0%, #dc262615 100%);
+            color: #ef4444;
+        }
+
+        .file-gallery-item .pdf-icon i {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .file-gallery-item .pdf-icon span {
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            padding: 0 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
+        .file-gallery-item .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: rgba(239, 68, 68, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .file-gallery-item:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .file-gallery-item .file-type-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            color: white;
+        }
+
+        /* Existing Files Section */
+        .existing-files-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .existing-files-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .existing-files-title i {
+            color: var(--success);
+        }
+
+        /* File Viewer Modal - Professional Design */
+        .file-viewer-modal {
+            max-width: 95vw;
+            width: 900px;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .file-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .file-viewer-title-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .file-viewer-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .file-viewer-title {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .file-viewer-page-info {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .file-viewer-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .file-viewer-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .file-nav-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .file-nav-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .file-nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            margin: 0 4px;
+        }
+
+        .file-action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .file-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .file-action-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .file-action-btn i {
+            font-size: 12px;
+        }
+
+        .file-close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+
+        .file-close-btn:hover {
+            background: rgba(239, 68, 68, 0.8);
+        }
+
+        .file-viewer-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a2e;
+            overflow: auto;
+            min-height: 400px;
+            max-height: calc(95vh - 70px);
+            padding: 16px;
+        }
+
+        .pdf-canvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            border-radius: 4px;
+        }
+
+        .image-viewer {
+            max-width: 100%;
+            max-height: calc(95vh - 100px);
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        .file-loading {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .file-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .file-loading p {
+            font-size: 13px;
+        }
+
+        .file-error {
+            text-align: center;
+            color: #ef4444;
+        }
+
+        .file-error i {
+            font-size: 36px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .file-error p {
+            font-size: 13px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            .file-viewer-modal {
+                width: 100%;
+                max-width: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            .file-viewer-header {
+                padding: 10px 12px;
+            }
+
+            .file-viewer-title {
+                font-size: 13px;
+                max-width: 120px;
+            }
+
+            .file-viewer-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .file-action-label {
+                display: none;
+            }
+
+            .file-action-btn {
+                padding: 6px 8px;
+            }
+
+            .file-nav-btn {
+                width: 26px;
+                height: 26px;
+            }
+
+            .file-viewer-content {
+                min-height: calc(100vh - 120px);
+                max-height: calc(100vh - 60px);
+                padding: 12px;
+            }
+
+            .pdf-canvas {
+                max-width: 100%;
+            }
+        }
+
+        /* Tablet */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .file-viewer-modal {
+                width: 90vw;
+                max-width: 800px;
+            }
+        }
+
+        /* Print styles for file viewer */
+        @media print {
+            .file-viewer-header {
+                display: none !important;
+            }
+            .file-viewer-content {
+                background: white !important;
+                max-height: none !important;
+            }
+            .pdf-canvas, .image-viewer {
+                max-width: 100% !important;
+                max-height: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        /* Professional Modal Enhancements */
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Mobile Modal Full Screen */
+        @media (max-width: 640px) {
+            .modal {
+                padding: 0;
+                align-items: flex-end;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 24px 24px 0 0;
+                animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .modal-content > div:first-child {
+                border-radius: 24px 24px 0 0;
+            }
+            
+            .modal-content > div:last-child {
+                border-radius: 0;
+            }
+            
+            @keyframes modalSlideUp {
+                from { opacity: 0; transform: translateY(100%); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        /* Tablet Modal */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .modal-content {
+                max-width: 90%;
+            }
+        }
+
+        /* Form label styling consistency */
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* Flatpickr Custom Styling */
+        .flatpickr-calendar {
+            font-family: 'Inter', sans-serif !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .flatpickr-months {
+            border-radius: 16px 16px 0 0 !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 8px !important;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            color: white !important;
+            fill: white !important;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        .flatpickr-months .flatpickr-prev-month,
+        .flatpickr-months .flatpickr-next-month {
+            fill: white !important;
+            color: white !important;
+        }
+
+        .flatpickr-months .flatpickr-prev-month:hover,
+        .flatpickr-months .flatpickr-next-month:hover {
+            background: rgba(255,255,255,0.2) !important;
+            border-radius: 8px !important;
+        }
+
+        .flatpickr-weekdays {
+            background: transparent !important;
+        }
+
+        .flatpickr-weekday {
+            color: var(--text-muted) !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+        }
+
+        .flatpickr-day {
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+
+        .flatpickr-day:hover {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%) !important;
+            border-color: transparent !important;
+        }
+
+        .flatpickr-day.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-color: transparent !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--primary) !important;
+        }
+
+        .flatpickr-day.today:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+
+        /* Dark mode support for flatpickr */
+        .dark .flatpickr-calendar {
+            background: var(--bg-card) !important;
+        }
+
+        .dark .flatpickr-day {
+            color: var(--text-primary) !important;
+        }
+
+        .dark .flatpickr-day.prevMonthDay,
+        .dark .flatpickr-day.nextMonthDay {
+            color: var(--text-muted) !important;
         }
     </style>
 </head>
@@ -825,13 +1434,13 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <div class="sidebar-logo">
                     <i class="fa-solid fa-paper-plane"></i>
                 </div>
                 <div>
-                    <h1 class="text-white font-bold text-xl tracking-tight">TravelPlan</h1>
-                    <p class="text-white/50 text-sm font-medium">Itinerary Manager</p>
+                    <h1 class="text-white font-semibold text-base tracking-tight">TravelPlan</h1>
+                    <p class="text-white/50 text-xs">Itinerary Manager</p>
                 </div>
             </div>
         </div>
@@ -878,11 +1487,15 @@
                 <i class="fa-solid fa-download"></i>
                 <span>Export Data</span>
             </div>
+            <div class="nav-item" onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </div>
         </nav>
 
         <!-- Sync Status -->
-        <div class="absolute bottom-0 left-0 right-0 p-5 border-t border-white/10">
-            <div id="sidebarSyncStatus" class="sync-badge sync-connected">
+        <div class="absolute bottom-0 left-0 right-0 p-3 border-t border-white/10">
+            <div id="sidebarSyncStatus" class="sync-badge sync-connected text-xs">
                 <div class="pulse-dot"></div>
                 <span>Connected</span>
             </div>
@@ -891,10 +1504,10 @@
 
     <!-- Mobile Header -->
     <header class="mobile-header">
-        <button onclick="toggleSidebar()" class="text-white p-2 -ml-2">
-            <i class="fa-solid fa-bars text-xl"></i>
+        <button onclick="toggleSidebar()" class="text-white p-1.5 -ml-1">
+            <i class="fa-solid fa-bars text-lg"></i>
         </button>
-        <span class="text-white font-bold text-lg">TravelPlan</span>
+        <span class="text-white font-semibold text-sm">TravelPlan</span>
         <div id="mobileSyncStatus" class="sync-badge sync-connected">
             <div class="pulse-dot"></div>
         </div>
@@ -933,7 +1546,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="p-6 md:p-8 max-w-7xl">
+        <div class="p-4 md:p-6 max-w-7xl">
             <!-- Dashboard -->
             <div id="tab-dashboard" class="tab-content">
                 <div class="mb-8">
@@ -1122,7 +1735,7 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold mb-2">Date</label>
-                                    <input type="date" id="builderDate" required class="form-input">
+                                    <input type="text" id="builderDate" required class="form-input" placeholder="DD/MM/YYYY" maxlength="10">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold mb-2">City</label>
@@ -1198,46 +1811,88 @@
         </div>
     </main>
 
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-card">
+            <div class="w-20 h-20 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg text-white text-3xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Login Required</h2>
+            <p class="text-gray-500 mb-8">Please enter the default password to access</p>
+            
+            <form id="authForm" class="space-y-4">
+                <input type="password" id="authPassword" class="form-input text-center text-lg tracking-widest" placeholder="••••" required>
+                <button type="submit" class="w-full btn btn-primary py-4 text-lg shadow-lg">
+                    <i class="fa-solid fa-arrow-right"></i> Login
+                </button>
+            </form>
+            <p class="mt-6 text-sm text-gray-400">
+                Default Password: <strong>1234</strong>
+            </p>
+        </div>
+    </div>
+
     <!-- Firebase Config Modal -->
     <div id="firebaseConfigModal" class="modal">
         <div class="modal-content max-w-md">
-            <div class="p-8">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-lg">
-                        <i class="fa-solid fa-database text-white text-3xl"></i>
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-plug"></i>
                     </div>
-                    <h2 class="text-2xl font-bold">Firebase Setup</h2>
-                    <p class="text-[var(--text-secondary)] mt-2">Connect to your realtime database</p>
+                    <div>
+                        <h3 class="text-lg font-bold">Firebase Setup</h3>
+                        <p class="text-xs text-white/70">Connect to database</p>
+                    </div>
                 </div>
-
-                <div class="flex mb-6 bg-[var(--bg-light)] rounded-xl p-1.5">
-                    <button type="button" onclick="switchConfigTab('json')" id="jsonTabBtn" class="flex-1 py-3 px-4 rounded-lg text-sm font-bold bg-[var(--bg-card)] shadow-sm">
-                        Paste JSON
+            </div>
+            <!-- Content -->
+            <div class="p-5">
+                <div class="flex mb-5 bg-[var(--bg-light)] rounded-xl p-1">
+                    <button type="button" onclick="switchConfigTab('json')" id="jsonTabBtn" class="flex-1 py-2.5 px-4 rounded-lg text-sm font-bold bg-[var(--bg-card)] shadow-sm">
+                        <i class="fa-solid fa-code mr-1"></i> Paste JSON
                     </button>
-                    <button type="button" onclick="switchConfigTab('manual')" id="manualTabBtn" class="flex-1 py-3 px-4 rounded-lg text-sm font-bold text-[var(--text-muted)]">
-                        Manual Entry
+                    <button type="button" onclick="switchConfigTab('manual')" id="manualTabBtn" class="flex-1 py-2.5 px-4 rounded-lg text-sm font-bold text-[var(--text-muted)]">
+                        <i class="fa-solid fa-keyboard mr-1"></i> Manual
                     </button>
                 </div>
 
                 <div id="jsonConfigTab">
-                    <textarea id="configJsonInput" rows="8" placeholder='Paste your Firebase config JSON here...' class="form-input font-mono text-sm mb-5"></textarea>
-                    <button type="button" onclick="connectWithJson()" class="w-full btn btn-primary py-4">
-                        <i class="fa-solid fa-plug"></i> Connect
+                    <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Firebase Config JSON</label>
+                    <textarea id="configJsonInput" rows="6" placeholder='Paste your Firebase config JSON here...' class="form-input font-mono text-xs mb-4"></textarea>
+                    <button type="button" onclick="connectWithJson()" class="w-full btn btn-primary py-3">
+                        <i class="fa-solid fa-plug"></i> Connect to Firebase
                     </button>
                 </div>
 
-                <form id="firebaseConfigForm" class="space-y-4 hidden">
-                    <input type="text" id="configApiKey" required placeholder="API Key" class="form-input">
-                    <input type="text" id="configAuthDomain" required placeholder="Auth Domain" class="form-input">
-                    <input type="text" id="configDatabaseURL" required placeholder="Database URL" class="form-input">
-                    <input type="text" id="configProjectId" required placeholder="Project ID" class="form-input">
-                    <input type="text" id="configStorageBucket" placeholder="Storage Bucket (optional)" class="form-input">
-                    <button type="submit" class="w-full btn btn-primary py-4">
-                        <i class="fa-solid fa-plug"></i> Connect
+                <form id="firebaseConfigForm" class="space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">API Key</label>
+                        <input type="text" id="configApiKey" required placeholder="AIza..." class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Auth Domain</label>
+                        <input type="text" id="configAuthDomain" required placeholder="your-app.firebaseapp.com" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Database URL</label>
+                        <input type="text" id="configDatabaseURL" required placeholder="https://your-app.firebaseio.com" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Project ID</label>
+                        <input type="text" id="configProjectId" required placeholder="your-project-id" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Storage Bucket (optional)</label>
+                        <input type="text" id="configStorageBucket" placeholder="your-app.appspot.com" class="form-input">
+                    </div>
+                    <button type="submit" class="w-full btn btn-primary py-3 mt-2">
+                        <i class="fa-solid fa-plug"></i> Connect to Firebase
                     </button>
                 </form>
 
-                <div id="configError" class="hidden mt-5 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400 text-sm font-medium"></div>
+                <div id="configError" class="hidden mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400 text-sm font-medium"></div>
             </div>
         </div>
     </div>
@@ -1253,46 +1908,62 @@
     <!-- Day Modal -->
     <div id="dayModal" class="modal">
         <div class="modal-content">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold" id="dayModalTitle">Add Day</h3>
-                    <button onclick="closeDayModal()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold" id="dayModalTitle">Add Day</h3>
+                        <p class="text-xs text-white/70">Plan your travel day</p>
+                    </div>
                 </div>
-                <form id="dayForm" class="space-y-5">
+                <button onclick="closeDayModal()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-red-500/80 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Form Content -->
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
+                <form id="dayForm" class="space-y-4">
                     <input type="hidden" id="dayId">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-2">Date</label>
-                            <input type="date" id="dayDate" required class="form-input">
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Date</label>
+                            <input type="text" id="dayDate" required class="form-input" placeholder="DD/MM/YYYY" maxlength="10">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-2">City</label>
-                            <input type="text" id="dayCity" required class="form-input">
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">City</label>
+                            <input type="text" id="dayCity" required class="form-input" placeholder="e.g., Paris">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Hotel</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Hotel</label>
                         <select id="dayHotel" class="form-input"></select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Transport</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Transport</label>
                         <select id="dayTransport" multiple class="form-input h-24"></select>
+                        <p class="text-xs text-[var(--text-muted)] mt-1">Hold Ctrl/Cmd to select multiple</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Activities (one per line)</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Activities (one per line)</label>
                         <textarea id="dayActivities" rows="4" class="form-input" placeholder="Morning coffee at local cafe&#10;Visit museum&#10;Lunch at..."></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Notes</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Notes</label>
                         <textarea id="dayNotes" rows="2" class="form-input" placeholder="Any additional notes..."></textarea>
                     </div>
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 btn btn-primary">
-                            <i class="fa-solid fa-check"></i> Save
-                        </button>
-                        <button type="button" onclick="closeDayModal()" class="btn btn-secondary">Cancel</button>
-                    </div>
                 </form>
+            </div>
+            <!-- Footer Actions -->
+            <div class="flex gap-3 p-4 border-t border-[var(--border-color)] bg-[var(--bg-light)] rounded-b-3xl">
+                <button type="button" onclick="closeDayModal()" class="flex-1 btn btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button type="submit" form="dayForm" class="flex-1 btn btn-primary">
+                    <i class="fa-solid fa-check"></i> Save Day
+                </button>
             </div>
         </div>
     </div>
@@ -1300,55 +1971,83 @@
     <!-- Hotel Modal -->
     <div id="hotelModal" class="modal">
         <div class="modal-content">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold" id="hotelModalTitle">Add Hotel</h3>
-                    <button onclick="closeHotelModal()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-hotel"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold" id="hotelModalTitle">Add Hotel</h3>
+                        <p class="text-xs text-white/70">Accommodation details</p>
+                    </div>
                 </div>
-                <form id="hotelForm" class="space-y-5">
+                <button onclick="closeHotelModal()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-red-500/80 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Form Content -->
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
+                <form id="hotelForm" class="space-y-4">
                     <input type="hidden" id="hotelId">
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Hotel Name</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Hotel Name</label>
                         <input type="text" id="hotelName" required class="form-input" placeholder="e.g., Grand Hotel">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">City</label>
-                        <input type="text" id="hotelCity" required class="form-input" placeholder="e.g., Paris">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Address</label>
-                        <input type="text" id="hotelAddress" class="form-input" placeholder="Full address">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-2">Check-in</label>
-                            <input type="date" id="hotelCheckIn" required class="form-input">
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">City</label>
+                            <input type="text" id="hotelCity" required class="form-input" placeholder="e.g., Paris">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-2">Check-out</label>
-                            <input type="date" id="hotelCheckOut" required class="form-input">
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Address</label>
+                            <input type="text" id="hotelAddress" class="form-input" placeholder="Full address">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Check-in</label>
+                            <input type="text" id="hotelCheckIn" required class="form-input" placeholder="DD/MM/YYYY" maxlength="10">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Check-out</label>
+                            <input type="text" id="hotelCheckOut" required class="form-input" placeholder="DD/MM/YYYY" maxlength="10">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Booking Reference</label>
+                            <input type="text" id="hotelReference" class="form-input" placeholder="e.g., BK-12345">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Contact</label>
+                            <input type="text" id="hotelContact" class="form-input" placeholder="Phone or email">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Booking Reference</label>
-                        <input type="text" id="hotelReference" class="form-input" placeholder="e.g., BK-12345">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Contact</label>
-                        <input type="text" id="hotelContact" class="form-input" placeholder="Phone or email">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Confirmation PDF</label>
-                        <input type="file" id="hotelPdf" accept=".pdf" class="form-input">
-                        <div id="hotelPdfPreview" class="mt-2"></div>
-                    </div>
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 btn btn-primary">
-                            <i class="fa-solid fa-check"></i> Save
-                        </button>
-                        <button type="button" onclick="closeHotelModal()" class="btn btn-secondary">Cancel</button>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Documents</label>
+                        <div class="file-upload-zone" id="hotelUploadZone" onclick="document.getElementById('hotelFiles').click()">
+                            <input type="file" id="hotelFiles" accept="image/*,.pdf" multiple class="hidden" onchange="handleHotelFileSelect(event)">
+                            <div class="text-center py-4">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] flex items-center justify-center text-white text-xl">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <p class="font-semibold text-sm text-[var(--text-primary)]">Click to upload</p>
+                                <p class="text-xs text-[var(--text-muted)]">Images & PDFs</p>
+                            </div>
+                        </div>
+                        <div id="hotelFilesGallery" class="file-gallery mt-3"></div>
                     </div>
                 </form>
+            </div>
+            <!-- Footer Actions -->
+            <div class="flex gap-3 p-4 border-t border-[var(--border-color)] bg-[var(--bg-light)] rounded-b-3xl">
+                <button type="button" onclick="closeHotelModal()" class="flex-1 btn btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button type="submit" form="hotelForm" class="flex-1 btn btn-primary">
+                    <i class="fa-solid fa-check"></i> Save Hotel
+                </button>
             </div>
         </div>
     </div>
@@ -1356,70 +2055,98 @@
     <!-- Transport Modal -->
     <div id="transportModal" class="modal">
         <div class="modal-content">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold" id="transportModalTitle">Add Transport</h3>
-                    <button onclick="closeTransportModal()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
-                </div>
-                <form id="transportForm" class="space-y-5">
-                    <input type="hidden" id="transportId">
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-train"></i>
+                    </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Date</label>
-                        <input type="date" id="transportDate" required class="form-input">
+                        <h3 class="text-lg font-bold" id="transportModalTitle">Add Transport</h3>
+                        <p class="text-xs text-white/70">Travel booking details</p>
+                    </div>
+                </div>
+                <button onclick="closeTransportModal()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-red-500/80 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Form Content -->
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
+                <form id="transportForm" class="space-y-4">
+                    <input type="hidden" id="transportId">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Date</label>
+                            <input type="text" id="transportDate" required class="form-input" placeholder="DD/MM/YYYY" maxlength="10">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Type</label>
+                            <select id="transportType" required class="form-input">
+                                <option value="flight">✈️ Flight</option>
+                                <option value="train">🚆 Train</option>
+                                <option value="bus">🚌 Bus</option>
+                                <option value="boat">⛴️ Boat / Ferry</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-2">From</label>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">From</label>
                             <input type="text" id="transportFrom" required class="form-input" placeholder="Departure city">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-2">To</label>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">To</label>
                             <input type="text" id="transportTo" required class="form-input" placeholder="Arrival city">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Type</label>
-                        <select id="transportType" required class="form-input">
-                            <option value="flight">✈️ Flight</option>
-                            <option value="train">🚆 Train</option>
-                            <option value="bus">🚌 Bus</option>
-                            <option value="boat">⛴️ Boat / Ferry</option>
-                        </select>
-                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-2">Departure Time</label>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Departure</label>
                             <input type="time" id="transportDeparture" required class="form-input">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-2">Arrival Time</label>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Arrival</label>
                             <input type="time" id="transportArrival" required class="form-input">
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Seat / Coach</label>
-                        <input type="text" id="transportSeat" class="form-input" placeholder="e.g., Car 4, Seat 25">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Seat / Coach</label>
+                            <input type="text" id="transportSeat" class="form-input" placeholder="e.g., Car 4, Seat 25">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Reference</label>
+                            <input type="text" id="transportReference" class="form-input" placeholder="e.g., TKT-123456">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Booking Reference</label>
-                        <input type="text" id="transportReference" class="form-input" placeholder="e.g., TKT-123456">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Notes</label>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Notes</label>
                         <textarea id="transportNotes" rows="2" class="form-input" placeholder="Platform, gate, etc."></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2">Ticket PDF</label>
-                        <input type="file" id="transportPdf" accept=".pdf" class="form-input">
-                        <div id="transportPdfPreview" class="mt-2"></div>
-                    </div>
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="flex-1 btn btn-primary">
-                            <i class="fa-solid fa-check"></i> Save
-                        </button>
-                        <button type="button" onclick="closeTransportModal()" class="btn btn-secondary">Cancel</button>
+                        <label class="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Documents</label>
+                        <div class="file-upload-zone" id="transportUploadZone" onclick="document.getElementById('transportFiles').click()">
+                            <input type="file" id="transportFiles" accept="image/*,.pdf" multiple class="hidden" onchange="handleTransportFileSelect(event)">
+                            <div class="text-center py-4">
+                                <div class="w-12 h-12 mx-auto mb-2 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] flex items-center justify-center text-white text-xl">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <p class="font-semibold text-sm text-[var(--text-primary)]">Click to upload</p>
+                                <p class="text-xs text-[var(--text-muted)]">Images & PDFs</p>
+                            </div>
+                        </div>
+                        <div id="transportFilesGallery" class="file-gallery mt-3"></div>
                     </div>
                 </form>
+            </div>
+            <!-- Footer Actions -->
+            <div class="flex gap-3 p-4 border-t border-[var(--border-color)] bg-[var(--bg-light)] rounded-b-3xl">
+                <button type="button" onclick="closeTransportModal()" class="flex-1 btn btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button type="submit" form="transportForm" class="flex-1 btn btn-primary">
+                    <i class="fa-solid fa-check"></i> Save Transport
+                </button>
             </div>
         </div>
     </div>
@@ -1427,32 +2154,48 @@
     <!-- Firebase Settings Modal -->
     <div id="firebaseSettingsModal" class="modal">
         <div class="modal-content max-w-md">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold">Database Settings</h3>
-                    <button onclick="closeFirebaseSettings()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Database Settings</h3>
+                        <p class="text-xs text-white/70">Manage your data</p>
+                    </div>
                 </div>
-
-                <div class="bg-[var(--bg-light)] rounded-2xl p-5 mb-6">
-                    <div class="section-title mb-3">Current Connection</div>
+                <button onclick="closeFirebaseSettings()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-red-500/80 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
+                <div class="bg-[var(--bg-light)] rounded-xl p-4 mb-5">
+                    <div class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Connection Status</div>
                     <div id="configDetails" class="space-y-2"></div>
                 </div>
 
-                <div class="space-y-3">
-                    <button onclick="loadAlpineRomanceData()" class="w-full btn btn-success py-4">
+                <div class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">Data Actions</div>
+                <div class="space-y-2">
+                    <button onclick="loadAlpineRomanceData()" class="w-full btn btn-success py-3">
                         <i class="fa-solid fa-mountain-sun"></i> Load Alpine Romance Trip
                     </button>
-                    <button onclick="loadSampleData()" class="w-full btn btn-primary py-4">
+                    <button onclick="loadSampleData()" class="w-full btn btn-primary py-3">
                         <i class="fa-solid fa-database"></i> Load Sample Data
                     </button>
-                    <button onclick="clearAllData()" class="w-full btn btn-danger py-4">
+                    <button onclick="clearAllData()" class="w-full btn btn-danger py-3">
                         <i class="fa-solid fa-trash"></i> Clear All Data
                     </button>
-                    <button onclick="reconfigureFirebase()" class="w-full btn btn-secondary py-4">
+                </div>
+
+                <div class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3 mt-5">Configuration</div>
+                <div class="space-y-2">
+                    <button onclick="reconfigureFirebase()" class="w-full btn btn-secondary py-3">
                         <i class="fa-solid fa-gear"></i> Change Firebase Config
                     </button>
-                    <button onclick="resetToDefaultConfig()" class="w-full btn btn-secondary py-4">
-                        <i class="fa-solid fa-rotate-left"></i> Reset to Default Config
+                    <button onclick="resetToDefaultConfig()" class="w-full btn btn-secondary py-3">
+                        <i class="fa-solid fa-rotate-left"></i> Reset to Default
                     </button>
                 </div>
             </div>
@@ -1461,13 +2204,56 @@
 
     <!-- File Viewer Modal -->
     <div id="fileViewerModal" class="modal">
-        <div class="modal-content max-w-4xl">
-            <div class="p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold" id="fileViewerTitle">File</h3>
-                    <button onclick="closeFileViewer()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="modal-content file-viewer-modal">
+            <!-- Header -->
+            <div class="file-viewer-header">
+                <div class="file-viewer-title-section">
+                    <div class="file-viewer-icon" id="fileViewerIcon">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <h3 class="file-viewer-title" id="fileViewerTitle">Document</h3>
+                        <div id="pdfPageInfo" class="file-viewer-page-info hidden">Page 1 of 1</div>
+                    </div>
                 </div>
-                <div id="fileViewerContent" class="min-h-[400px] flex items-center justify-center bg-[var(--bg-light)] rounded-2xl"></div>
+                <div class="file-viewer-actions">
+                    <!-- PDF Navigation -->
+                    <div id="pdfNavigation" class="file-viewer-nav hidden">
+                        <button onclick="pdfPrevPage()" class="file-nav-btn" title="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button onclick="pdfNextPage()" class="file-nav-btn" title="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                        <div class="file-nav-divider"></div>
+                        <button onclick="pdfZoomOut()" class="file-nav-btn" title="Zoom Out"><i class="fa-solid fa-minus"></i></button>
+                        <button onclick="pdfZoomIn()" class="file-nav-btn" title="Zoom In"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="file-action-buttons">
+                        <button onclick="printCurrentFile()" class="file-action-btn" title="Print">
+                            <i class="fa-solid fa-print"></i>
+                            <span class="file-action-label">Print</span>
+                        </button>
+                        <button onclick="downloadCurrentFile()" class="file-action-btn" title="Download">
+                            <i class="fa-solid fa-download"></i>
+                            <span class="file-action-label">Download</span>
+                        </button>
+                    </div>
+                    <button onclick="closeFileViewer()" class="file-close-btn" title="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div id="fileViewerContent" class="file-viewer-content">
+                <canvas id="pdfCanvas" class="pdf-canvas hidden"></canvas>
+                <img id="imageViewer" class="image-viewer hidden">
+                <div id="fileLoading" class="file-loading hidden">
+                    <div class="file-loading-spinner"></div>
+                    <p>Loading document...</p>
+                </div>
+                <div id="fileError" class="file-error hidden">
+                    <i class="fa-solid fa-exclamation-circle"></i>
+                    <p id="fileErrorMessage">Unable to load file</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1475,11 +2261,23 @@
     <!-- Gallery Modal -->
     <div id="galleryModal" class="modal">
         <div class="modal-content max-w-4xl">
-            <div class="p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">Images</h3>
-                    <button onclick="closeGallery()" class="action-btn"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <!-- Professional Header -->
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-images"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">Photo Gallery</h3>
+                        <p class="text-xs text-white/70">Click image to view full size</p>
+                    </div>
                 </div>
+                <button onclick="closeGallery()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-red-500/80 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Content -->
+            <div class="p-5 max-h-[70vh] overflow-y-auto">
                 <div id="galleryContent" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
             </div>
         </div>
@@ -1602,6 +2400,9 @@
             database.ref('files').on('value', (snapshot) => {
                 dataCache.files = snapshot.val() || {};
                 localStorage.setItem('travelplan_offline_data', JSON.stringify(dataCache));
+                // Re-render to show documents after files load
+                renderHotels();
+                renderTransportGuide();
             });
         }
 
@@ -1678,12 +2479,103 @@
         // Rendering
         function formatDate(dateStr) {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+            return `${weekday}, ${day}/${month}/${year}`;
         }
 
         function formatShortDate(dateStr) {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${day}/${month}`;
+        }
+        
+        function formatFullDate(dateStr) {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Convert ISO date (YYYY-MM-DD) to display format (DD/MM/YYYY)
+        function toDisplayDate(isoDate) {
+            if (!isoDate) return '';
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        // Convert display format (DD/MM/YYYY) to ISO date (YYYY-MM-DD)
+        function toISODate(displayDate) {
+            if (!displayDate) return '';
+            const parts = displayDate.split('/');
+            if (parts.length !== 3) return displayDate;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        // Format date input as user types
+        function formatDateInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length >= 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            }
+            input.value = value;
+        }
+
+        // Initialize date inputs with Flatpickr
+        function initDateInputs() {
+            const dateInputs = document.querySelectorAll('input[placeholder="DD/MM/YYYY"]');
+            dateInputs.forEach(input => {
+                // Initialize Flatpickr on each date input
+                if (!input._flatpickr) {
+                    flatpickr(input, {
+                        dateFormat: "d/m/Y",
+                        allowInput: true,
+                        clickOpens: true,
+                        disableMobile: false,
+                        animate: true,
+                        onReady: function(selectedDates, dateStr, instance) {
+                            // Add calendar icon to the input
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'relative';
+                            input.parentNode.insertBefore(wrapper, input);
+                            wrapper.appendChild(input);
+                        }
+                    });
+                }
+                
+                // Also allow manual typing with auto-format
+                input.addEventListener('input', function(e) {
+                    // Only format if user is typing (not selecting from picker)
+                    if (!e.inputType) return;
+                    formatDateInput(this);
+                });
+            });
+        }
+        
+        // Re-initialize date pickers when modals open
+        function initModalDatePickers() {
+            setTimeout(() => {
+                const dateInputs = document.querySelectorAll('.modal.active input[placeholder="DD/MM/YYYY"]');
+                dateInputs.forEach(input => {
+                    if (!input._flatpickr) {
+                        flatpickr(input, {
+                            dateFormat: "d/m/Y",
+                            allowInput: true,
+                            clickOpens: true,
+                            disableMobile: false,
+                            animate: true
+                        });
+                    }
+                });
+            }, 100);
         }
 
         function getTransportIcon(type) {
@@ -1714,11 +2606,13 @@
                 upcomingContainer.innerHTML = upcomingDays.map(day => {
                     const hotel = hotels.find(h => h.id === day.hotelId);
                     const date = new Date(day.date);
+                    const dayNum = String(date.getDate()).padStart(2, '0');
+                    const monthNum = String(date.getMonth() + 1).padStart(2, '0');
                     return `
                         <div class="upcoming-item" onclick="goToDay('${day.id}')">
                             <div class="upcoming-date">
-                                <span class="month">${date.toLocaleDateString('en-US', { month: 'short' })}</span>
-                                <span class="day">${date.getDate()}</span>
+                                <span class="month">${dayNum}/${monthNum}</span>
+                                <span class="day">${date.getFullYear()}</span>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="font-bold text-lg">${day.city}</div>
@@ -1742,7 +2636,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="font-bold">${t.from} → ${t.to}</div>
-                            <div class="text-sm text-[var(--text-secondary)]">${formatShortDate(t.date)} · ${t.departureTime}</div>
+                            <div class="text-sm text-[var(--text-secondary)]">${formatFullDate(t.date)} · ${t.departureTime}</div>
                         </div>
                         <span class="transport-badge transport-${t.type} capitalize">${t.type}</span>
                     </div>`).join('');
@@ -1937,19 +2831,31 @@
                         <div class="flex items-center gap-3 text-sm mb-4 p-3 bg-[var(--bg-light)] rounded-xl">
                             <div class="text-center">
                                 <div class="text-xs text-[var(--text-muted)]">Check-in</div>
-                                <div class="font-bold">${formatShortDate(hotel.checkIn)}</div>
+                                <div class="font-bold">${formatFullDate(hotel.checkIn)}</div>
                             </div>
                             <i class="fa-solid fa-arrow-right text-[var(--text-muted)]"></i>
                             <div class="text-center">
                                 <div class="text-xs text-[var(--text-muted)]">Check-out</div>
-                                <div class="font-bold">${formatShortDate(hotel.checkOut)}</div>
+                                <div class="font-bold">${formatFullDate(hotel.checkOut)}</div>
                             </div>
                             <div class="ml-auto info-badge">${nights} nights</div>
                         </div>
 
                         ${hotel.reference ? `<div class="text-sm text-[var(--text-secondary)] mb-3"><i class="fa-solid fa-hashtag mr-2"></i>${hotel.reference}</div>` : ''}
                         ${hotel.contact ? `<div class="text-sm text-[var(--text-secondary)] mb-3"><i class="fa-solid fa-phone mr-2"></i>${hotel.contact}</div>` : ''}
-                        ${hotel.pdfId ? `<button onclick="viewFile('${hotel.pdfId}')" class="btn btn-secondary w-full mt-3"><i class="fa-solid fa-file-pdf"></i> View Confirmation</button>` : ''}
+                        ${(hotel.fileIds && hotel.fileIds.length > 0) || hotel.pdfId ? `
+                            <div class="mt-4 pt-4 border-t border-[var(--border-color)]">
+                                <div class="text-xs font-semibold text-[var(--text-muted)] uppercase mb-2">Documents</div>
+                                <div class="flex flex-wrap gap-2">
+                                    ${(hotel.fileIds || [hotel.pdfId].filter(Boolean)).map(fileId => {
+                                        const file = dataCache.files[fileId];
+                                        if (!file) return '';
+                                        return file.type === 'image' 
+                                            ? `<div onclick="viewFile('${fileId}')" class="w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 border-2 border-[var(--border-color)]"><img src="${file.data}" class="w-full h-full object-cover"></div>`
+                                            : `<button onclick="viewFile('${fileId}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-file-pdf text-red-500"></i> PDF</button>`;
+                                    }).join('')}
+                                </div>
+                            </div>` : ''}
                     </div>`;
             }).join('');
         }
@@ -1971,7 +2877,7 @@
                                 <i class="fa-solid ${getTransportIcon(t.type)}"></i>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-[var(--primary)] mb-1">${formatDate(t.date)}</div>
+                                <div class="text-sm font-semibold text-[var(--primary)] mb-1">${formatFullDate(t.date)}</div>
                                 <h3 class="text-xl font-bold mb-1">${t.from} → ${t.to}</h3>
                                 <div class="flex items-center gap-4 text-[var(--text-secondary)]">
                                     <span><i class="fa-solid fa-clock mr-1"></i> ${t.departureTime} - ${t.arrivalTime}</span>
@@ -1992,9 +2898,21 @@
                         </div>
                         ${t.seat ? `<div><span class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Seat</span><span class="font-semibold">${t.seat}</span></div>` : ''}
                         ${t.reference ? `<div><span class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Reference</span><span class="font-semibold">${t.reference}</span></div>` : ''}
-                        ${t.pdfId ? `<div><button onclick="viewFile('${t.pdfId}')" class="text-[var(--primary)] font-semibold hover:underline"><i class="fa-solid fa-file-pdf mr-1"></i>View Ticket</button></div>` : ''}
                     </div>
                     ${t.notes ? `<div class="mt-4 p-4 bg-[var(--bg-light)] rounded-xl text-sm"><i class="fa-solid fa-info-circle text-[var(--primary)] mr-2"></i>${t.notes}</div>` : ''}
+                    ${(t.fileIds && t.fileIds.length > 0) || t.pdfId ? `
+                        <div class="mt-4 pt-4 border-t border-[var(--border-color)]">
+                            <div class="text-xs font-semibold text-[var(--text-muted)] uppercase mb-2">Documents</div>
+                            <div class="flex flex-wrap gap-2">
+                                ${(t.fileIds || [t.pdfId].filter(Boolean)).map(fileId => {
+                                    const file = dataCache.files[fileId];
+                                    if (!file) return '';
+                                    return file.type === 'image' 
+                                        ? `<div onclick="viewFile('${fileId}')" class="w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 border-2 border-[var(--border-color)]"><img src="${file.data}" class="w-full h-full object-cover"></div>`
+                                        : `<button onclick="viewFile('${fileId}')" class="info-badge hover:bg-[var(--border-color)] cursor-pointer"><i class="fa-solid fa-file-pdf text-red-500"></i> PDF</button>`;
+                                }).join('')}
+                            </div>
+                        </div>` : ''}
                 </div>`).join('');
         }
 
@@ -2009,7 +2927,7 @@
 
             tbody.innerHTML = transports.map(t => `
                 <tr>
-                    <td class="font-bold">${formatShortDate(t.date)}</td>
+                    <td class="font-bold">${formatFullDate(t.date)}</td>
                     <td class="font-semibold">${t.from} <span class="text-[var(--text-muted)]">→</span> ${t.to}</td>
                     <td><span class="transport-badge transport-${t.type} capitalize"><i class="fa-solid ${getTransportIcon(t.type)} mr-1"></i>${t.type}</span></td>
                     <td class="text-[var(--text-secondary)]">${t.departureTime} - ${t.arrivalTime}</td>
@@ -2030,10 +2948,11 @@
             document.getElementById('dayModal').classList.add('active');
             document.getElementById('dayModalTitle').textContent = day ? 'Edit Day' : 'Add Day';
             updateSelects();
+            initModalDatePickers();
             
             if (day) {
                 document.getElementById('dayId').value = day.id;
-                document.getElementById('dayDate').value = day.date;
+                document.getElementById('dayDate').value = toDisplayDate(day.date);
                 document.getElementById('dayCity').value = day.city;
                 document.getElementById('dayHotel').value = day.hotelId || '';
                 document.getElementById('dayActivities').value = (day.activities || []).join('\n');
@@ -2053,7 +2972,11 @@
         function openHotelModal(hotel = null) {
             document.getElementById('hotelModal').classList.add('active');
             document.getElementById('hotelModalTitle').textContent = hotel ? 'Edit Hotel' : 'Add Hotel';
-            document.getElementById('hotelPdfPreview').innerHTML = '';
+            initModalDatePickers();
+            
+            // Reset file arrays
+            hotelPendingFiles = [];
+            hotelExistingFiles = [];
             
             if (hotel) {
                 document.getElementById('hotelId').value = hotel.id;
@@ -2064,19 +2987,195 @@
                 document.getElementById('hotelCheckOut').value = hotel.checkOut;
                 document.getElementById('hotelReference').value = hotel.reference || '';
                 document.getElementById('hotelContact').value = hotel.contact || '';
+                
+                // Load existing files
+                hotelExistingFiles = hotel.fileIds || [];
+                // Also support legacy single pdfId
+                if (hotel.pdfId && !hotelExistingFiles.includes(hotel.pdfId)) {
+                    hotelExistingFiles.push(hotel.pdfId);
+                }
             } else {
                 document.getElementById('hotelForm').reset();
                 document.getElementById('hotelId').value = '';
             }
+            
+            renderHotelFilesGallery();
         }
 
-        function closeHotelModal() { document.getElementById('hotelModal').classList.remove('active'); }
+        function closeHotelModal() { 
+            document.getElementById('hotelModal').classList.remove('active'); 
+            hotelPendingFiles = [];
+            hotelExistingFiles = [];
+        }
         function editHotel(id) { const hotel = getHotels().find(h => h.id === id); if (hotel) openHotelModal(hotel); }
+
+        // Hotel file handling
+        let hotelPendingFiles = [];
+        let hotelExistingFiles = [];
+
+        async function handleHotelFileSelect(event) {
+            const files = Array.from(event.target.files);
+            for (const file of files) {
+                const base64 = await fileToBase64(file);
+                const isImage = file.type.startsWith('image/');
+                hotelPendingFiles.push({
+                    id: generateId(),
+                    name: file.name,
+                    type: isImage ? 'image' : 'pdf',
+                    data: base64,
+                    isNew: true
+                });
+            }
+            renderHotelFilesGallery();
+            event.target.value = '';
+        }
+
+        function removeHotelPendingFile(fileId) {
+            hotelPendingFiles = hotelPendingFiles.filter(f => f.id !== fileId);
+            renderHotelFilesGallery();
+        }
+
+        function removeHotelExistingFile(fileId) {
+            hotelExistingFiles = hotelExistingFiles.filter(f => f !== fileId);
+            renderHotelFilesGallery();
+        }
+
+        function renderHotelFilesGallery() {
+            const gallery = document.getElementById('hotelFilesGallery');
+            let html = '';
+
+            // Pending new files
+            for (const file of hotelPendingFiles) {
+                if (file.type === 'image') {
+                    html += `
+                        <div class="file-gallery-item" onclick="viewFileData('${file.id}', true)">
+                            <img src="${file.data}" alt="${file.name}">
+                            <button class="remove-btn" onclick="event.stopPropagation(); removeHotelPendingFile('${file.id}')"><i class="fa-solid fa-xmark"></i></button>
+                            <span class="file-type-badge">NEW</span>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="file-gallery-item" onclick="viewFileData('${file.id}', true)">
+                            <div class="pdf-icon">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>${file.name}</span>
+                            </div>
+                            <button class="remove-btn" onclick="event.stopPropagation(); removeHotelPendingFile('${file.id}')"><i class="fa-solid fa-xmark"></i></button>
+                            <span class="file-type-badge">NEW</span>
+                        </div>`;
+                }
+            }
+
+            // Existing files
+            if (hotelExistingFiles.length > 0) {
+                html += `<div class="col-span-full existing-files-section"><div class="existing-files-title"><i class="fa-solid fa-check-circle"></i> Saved Documents</div><div class="file-gallery">`;
+                for (const fileId of hotelExistingFiles) {
+                    const file = dataCache.files[fileId];
+                    if (file) {
+                        if (file.type === 'image') {
+                            html += `
+                                <div class="file-gallery-item" onclick="viewFile('${fileId}')">
+                                    <img src="${file.data}" alt="${file.name}">
+                                    <button class="remove-btn" onclick="event.stopPropagation(); removeHotelExistingFile('${fileId}')"><i class="fa-solid fa-xmark"></i></button>
+                                </div>`;
+                        } else {
+                            html += `
+                                <div class="file-gallery-item" onclick="viewFile('${fileId}')">
+                                    <div class="pdf-icon">
+                                        <i class="fa-solid fa-file-pdf"></i>
+                                        <span>${file.name}</span>
+                                    </div>
+                                    <button class="remove-btn" onclick="event.stopPropagation(); removeHotelExistingFile('${fileId}')"><i class="fa-solid fa-xmark"></i></button>
+                                </div>`;
+                        }
+                    }
+                }
+                html += `</div></div>`;
+            }
+
+            gallery.innerHTML = html;
+        }
+
+        async function viewFileData(fileId, isPending = false) {
+            let file;
+            if (isPending) {
+                file = hotelPendingFiles.find(f => f.id === fileId) || transportPendingFiles.find(f => f.id === fileId);
+            }
+            if (!file) return;
+            
+            // Store current file info for print/download
+            currentFileData = file.data;
+            currentFileName = file.name || 'document';
+            currentFileType = file.type;
+            
+            document.getElementById('fileViewerTitle').textContent = file.name || 'File';
+            
+            // Update icon based on file type
+            const iconEl = document.getElementById('fileViewerIcon');
+            if (file.type === 'pdf') {
+                iconEl.innerHTML = '<i class="fa-solid fa-file-pdf"></i>';
+                iconEl.style.background = 'rgba(239, 68, 68, 0.3)';
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-image"></i>';
+                iconEl.style.background = 'rgba(16, 185, 129, 0.3)';
+            }
+            
+            // Reset visibility
+            document.getElementById('pdfCanvas').classList.add('hidden');
+            document.getElementById('imageViewer').classList.add('hidden');
+            document.getElementById('pdfNavigation').classList.add('hidden');
+            document.getElementById('pdfPageInfo').classList.add('hidden');
+            document.getElementById('fileLoading').classList.add('hidden');
+            document.getElementById('fileError').classList.add('hidden');
+            
+            if (file.type === 'pdf') {
+                // Show loading
+                document.getElementById('fileLoading').classList.remove('hidden');
+                document.getElementById('fileViewerModal').classList.add('active');
+                
+                try {
+                    // Convert base64 to Uint8Array for PDF.js
+                    const pdfData = base64ToUint8Array(file.data);
+                    
+                    // Load PDF using PDF.js
+                    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                    currentPdf = await loadingTask.promise;
+                    totalPages = currentPdf.numPages;
+                    currentPage = 1;
+                    currentScale = 1.5;
+                    
+                    // Hide loading, show canvas and navigation
+                    document.getElementById('fileLoading').classList.add('hidden');
+                    document.getElementById('pdfCanvas').classList.remove('hidden');
+                    document.getElementById('pdfNavigation').classList.remove('hidden');
+                    document.getElementById('pdfPageInfo').classList.remove('hidden');
+                    
+                    // Render first page
+                    await renderPdfPage(currentPage);
+                    
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                    document.getElementById('fileLoading').classList.add('hidden');
+                    document.getElementById('fileError').classList.remove('hidden');
+                    document.getElementById('fileErrorMessage').textContent = 'Unable to preview PDF';
+                }
+            } else {
+                // For images
+                const imageViewer = document.getElementById('imageViewer');
+                imageViewer.src = file.data;
+                imageViewer.classList.remove('hidden');
+                document.getElementById('fileViewerModal').classList.add('active');
+            }
+        }
 
         function openTransportModal(transport = null) {
             document.getElementById('transportModal').classList.add('active');
             document.getElementById('transportModalTitle').textContent = transport ? 'Edit Transport' : 'Add Transport';
-            document.getElementById('transportPdfPreview').innerHTML = '';
+            initModalDatePickers();
+            
+            // Reset file arrays
+            transportPendingFiles = [];
+            transportExistingFiles = [];
             
             if (transport) {
                 document.getElementById('transportId').value = transport.id;
@@ -2089,14 +3188,114 @@
                 document.getElementById('transportSeat').value = transport.seat || '';
                 document.getElementById('transportReference').value = transport.reference || '';
                 document.getElementById('transportNotes').value = transport.notes || '';
+                
+                // Load existing files
+                transportExistingFiles = transport.fileIds || [];
+                // Also support legacy single pdfId
+                if (transport.pdfId && !transportExistingFiles.includes(transport.pdfId)) {
+                    transportExistingFiles.push(transport.pdfId);
+                }
             } else {
                 document.getElementById('transportForm').reset();
                 document.getElementById('transportId').value = '';
             }
+            
+            renderTransportFilesGallery();
         }
 
-        function closeTransportModal() { document.getElementById('transportModal').classList.remove('active'); }
+        function closeTransportModal() { 
+            document.getElementById('transportModal').classList.remove('active'); 
+            transportPendingFiles = [];
+            transportExistingFiles = [];
+        }
         function editTransport(id) { const t = getTransport().find(t => t.id === id); if (t) openTransportModal(t); }
+
+        // Transport file handling
+        let transportPendingFiles = [];
+        let transportExistingFiles = [];
+
+        async function handleTransportFileSelect(event) {
+            const files = Array.from(event.target.files);
+            for (const file of files) {
+                const base64 = await fileToBase64(file);
+                const isImage = file.type.startsWith('image/');
+                transportPendingFiles.push({
+                    id: generateId(),
+                    name: file.name,
+                    type: isImage ? 'image' : 'pdf',
+                    data: base64,
+                    isNew: true
+                });
+            }
+            renderTransportFilesGallery();
+            event.target.value = '';
+        }
+
+        function removeTransportPendingFile(fileId) {
+            transportPendingFiles = transportPendingFiles.filter(f => f.id !== fileId);
+            renderTransportFilesGallery();
+        }
+
+        function removeTransportExistingFile(fileId) {
+            transportExistingFiles = transportExistingFiles.filter(f => f !== fileId);
+            renderTransportFilesGallery();
+        }
+
+        function renderTransportFilesGallery() {
+            const gallery = document.getElementById('transportFilesGallery');
+            let html = '';
+
+            // Pending new files
+            for (const file of transportPendingFiles) {
+                if (file.type === 'image') {
+                    html += `
+                        <div class="file-gallery-item" onclick="viewFileData('${file.id}', true)">
+                            <img src="${file.data}" alt="${file.name}">
+                            <button class="remove-btn" onclick="event.stopPropagation(); removeTransportPendingFile('${file.id}')"><i class="fa-solid fa-xmark"></i></button>
+                            <span class="file-type-badge">NEW</span>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="file-gallery-item" onclick="viewFileData('${file.id}', true)">
+                            <div class="pdf-icon">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span>${file.name}</span>
+                            </div>
+                            <button class="remove-btn" onclick="event.stopPropagation(); removeTransportPendingFile('${file.id}')"><i class="fa-solid fa-xmark"></i></button>
+                            <span class="file-type-badge">NEW</span>
+                        </div>`;
+                }
+            }
+
+            // Existing files
+            if (transportExistingFiles.length > 0) {
+                html += `<div class="col-span-full existing-files-section"><div class="existing-files-title"><i class="fa-solid fa-check-circle"></i> Saved Documents</div><div class="file-gallery">`;
+                for (const fileId of transportExistingFiles) {
+                    const file = dataCache.files[fileId];
+                    if (file) {
+                        if (file.type === 'image') {
+                            html += `
+                                <div class="file-gallery-item" onclick="viewFile('${fileId}')">
+                                    <img src="${file.data}" alt="${file.name}">
+                                    <button class="remove-btn" onclick="event.stopPropagation(); removeTransportExistingFile('${fileId}')"><i class="fa-solid fa-xmark"></i></button>
+                                </div>`;
+                        } else {
+                            html += `
+                                <div class="file-gallery-item" onclick="viewFile('${fileId}')">
+                                    <div class="pdf-icon">
+                                        <i class="fa-solid fa-file-pdf"></i>
+                                        <span>${file.name}</span>
+                                    </div>
+                                    <button class="remove-btn" onclick="event.stopPropagation(); removeTransportExistingFile('${fileId}')"><i class="fa-solid fa-xmark"></i></button>
+                                </div>`;
+                        }
+                    }
+                }
+                html += `</div></div>`;
+            }
+
+            gallery.innerHTML = html;
+        }
 
         function updateSelects() {
             const hotels = getHotels();
@@ -2115,7 +3314,7 @@
                 const select = document.getElementById(id);
                 if (select) {
                     const selected = Array.from(select.selectedOptions).map(o => o.value);
-                    select.innerHTML = transports.map(t => `<option value="${t.id}">${formatShortDate(t.date)} - ${t.from} → ${t.to}</option>`).join('');
+                    select.innerHTML = transports.map(t => `<option value="${t.id}">${formatFullDate(t.date)} - ${t.from} → ${t.to}</option>`).join('');
                     Array.from(select.options).forEach(opt => opt.selected = selected.includes(opt.value));
                 }
             });
@@ -2129,7 +3328,7 @@
             
             await saveDay({
                 id: dayId,
-                date: document.getElementById('dayDate').value,
+                date: toISODate(document.getElementById('dayDate').value),
                 city: document.getElementById('dayCity').value,
                 hotelId: document.getElementById('dayHotel').value || null,
                 transportIds: Array.from(document.getElementById('dayTransport').selectedOptions).map(o => o.value),
@@ -2144,26 +3343,28 @@
         document.getElementById('hotelForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const hotelId = document.getElementById('hotelId').value || generateId();
-            const existing = getHotels().find(h => h.id === hotelId);
+            
+            // Collect all file IDs
+            const allFileIds = [...hotelExistingFiles];
+            
+            // Save new pending files
+            for (const file of hotelPendingFiles) {
+                await saveFile(file.id, file.data, file.type, file.name);
+                allFileIds.push(file.id);
+            }
             
             const hotel = {
                 id: hotelId,
                 name: document.getElementById('hotelName').value,
                 city: document.getElementById('hotelCity').value,
                 address: document.getElementById('hotelAddress').value,
-                checkIn: document.getElementById('hotelCheckIn').value,
-                checkOut: document.getElementById('hotelCheckOut').value,
+                checkIn: toISODate(document.getElementById('hotelCheckIn').value),
+                checkOut: toISODate(document.getElementById('hotelCheckOut').value),
                 reference: document.getElementById('hotelReference').value,
                 contact: document.getElementById('hotelContact').value,
-                pdfId: existing?.pdfId || null
+                fileIds: allFileIds,
+                pdfId: allFileIds.length > 0 ? allFileIds[0] : null // Legacy support
             };
-
-            const pdfInput = document.getElementById('hotelPdf');
-            if (pdfInput.files.length > 0) {
-                const base64 = await fileToBase64(pdfInput.files[0]);
-                hotel.pdfId = generateId();
-                await saveFile(hotel.pdfId, base64, 'pdf', pdfInput.files[0].name);
-            }
 
             await saveHotel(hotel);
             closeHotelModal();
@@ -2172,11 +3373,19 @@
         document.getElementById('transportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const transportId = document.getElementById('transportId').value || generateId();
-            const existing = getTransport().find(t => t.id === transportId);
+            
+            // Collect all file IDs
+            const allFileIds = [...transportExistingFiles];
+            
+            // Save new pending files
+            for (const file of transportPendingFiles) {
+                await saveFile(file.id, file.data, file.type, file.name);
+                allFileIds.push(file.id);
+            }
             
             const transport = {
                 id: transportId,
-                date: document.getElementById('transportDate').value,
+                date: toISODate(document.getElementById('transportDate').value),
                 from: document.getElementById('transportFrom').value,
                 to: document.getElementById('transportTo').value,
                 type: document.getElementById('transportType').value,
@@ -2185,15 +3394,9 @@
                 seat: document.getElementById('transportSeat').value,
                 reference: document.getElementById('transportReference').value,
                 notes: document.getElementById('transportNotes').value,
-                pdfId: existing?.pdfId || null
+                fileIds: allFileIds,
+                pdfId: allFileIds.length > 0 ? allFileIds[0] : null // Legacy support
             };
-
-            const pdfInput = document.getElementById('transportPdf');
-            if (pdfInput.files.length > 0) {
-                const base64 = await fileToBase64(pdfInput.files[0]);
-                transport.pdfId = generateId();
-                await saveFile(transport.pdfId, base64, 'pdf', pdfInput.files[0].name);
-            }
 
             await saveTransport(transport);
             closeTransportModal();
@@ -2238,7 +3441,7 @@
 
             preview.innerHTML = `
                 <div class="border-l-4 border-[var(--primary)] pl-5">
-                    ${date ? `<div class="text-sm font-semibold text-[var(--primary)] mb-1">${formatDate(date)}</div>` : ''}
+                    ${date ? `<div class="text-sm font-semibold text-[var(--primary)] mb-1">${formatFullDate(date)}</div>` : ''}
                     ${city ? `<h4 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-location-dot text-[var(--secondary)]"></i>${city}</h4>` : ''}
                     ${hotel ? `<div class="p-3 bg-[var(--bg-light)] rounded-xl mb-3 flex items-center gap-3"><i class="fa-solid fa-hotel text-[var(--primary)]"></i><span class="font-semibold">${hotel.name}</span></div>` : ''}
                     ${transports.length ? `<div class="space-y-2 mb-4">${transports.map(t => `<div class="p-3 transport-${t.type} rounded-xl flex items-center gap-3"><i class="fa-solid ${getTransportIcon(t.type)}"></i><span class="font-semibold">${t.from} → ${t.to}</span></div>`).join('')}</div>` : ''}
@@ -2276,7 +3479,7 @@
 
             const day = {
                 id: generateId(),
-                date: document.getElementById('builderDate').value,
+                date: toISODate(document.getElementById('builderDate').value),
                 city: document.getElementById('builderCity').value,
                 hotelId: document.getElementById('builderHotel').value || null,
                 transportIds: Array.from(document.getElementById('builderTransport').selectedOptions).map(o => o.value),
@@ -2305,18 +3508,212 @@
             switchTab('itinerary');
         });
 
-        // File Viewer
+        // PDF.js Viewer State
+        let currentPdf = null;
+        let currentPage = 1;
+        let totalPages = 0;
+        let currentScale = 1.5;
+        let currentFileData = null;
+        let currentFileName = null;
+        let currentFileType = null;
+
+        // File Viewer - Convert base64 to Uint8Array for PDF.js
+        function base64ToUint8Array(base64Data) {
+            const base64WithoutPrefix = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+            const binaryString = atob(base64WithoutPrefix);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        async function renderPdfPage(pageNum) {
+            if (!currentPdf) return;
+            
+            try {
+                const page = await currentPdf.getPage(pageNum);
+                const canvas = document.getElementById('pdfCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                const viewport = page.getViewport({ scale: currentScale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                await page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                }).promise;
+                
+                // Update page info
+                document.getElementById('pdfPageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            } catch (error) {
+                console.error('Error rendering page:', error);
+            }
+        }
+
+        function pdfPrevPage() {
+            if (currentPage <= 1) return;
+            currentPage--;
+            renderPdfPage(currentPage);
+        }
+
+        function pdfNextPage() {
+            if (currentPage >= totalPages) return;
+            currentPage++;
+            renderPdfPage(currentPage);
+        }
+
+        function pdfZoomIn() {
+            currentScale += 0.25;
+            if (currentScale > 3) currentScale = 3;
+            renderPdfPage(currentPage);
+        }
+
+        function pdfZoomOut() {
+            currentScale -= 0.25;
+            if (currentScale < 0.5) currentScale = 0.5;
+            renderPdfPage(currentPage);
+        }
+
         async function viewFile(fileId) {
             const file = await getFile(fileId);
             if (!file) { alert('File not found'); return; }
+            
+            // Store current file info for print/download
+            currentFileData = file.data;
+            currentFileName = file.name || 'document';
+            currentFileType = file.type;
+            
             document.getElementById('fileViewerTitle').textContent = file.name || 'File';
-            document.getElementById('fileViewerContent').innerHTML = file.type === 'pdf' 
-                ? `<iframe src="${file.data}" class="w-full h-[500px] rounded-xl"></iframe>`
-                : `<img src="${file.data}" class="max-w-full max-h-[500px] rounded-xl shadow-lg">`;
-            document.getElementById('fileViewerModal').classList.add('active');
+            
+            // Update icon based on file type
+            const iconEl = document.getElementById('fileViewerIcon');
+            if (file.type === 'pdf') {
+                iconEl.innerHTML = '<i class="fa-solid fa-file-pdf"></i>';
+                iconEl.style.background = 'rgba(239, 68, 68, 0.3)';
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-image"></i>';
+                iconEl.style.background = 'rgba(16, 185, 129, 0.3)';
+            }
+            
+            // Reset visibility
+            document.getElementById('pdfCanvas').classList.add('hidden');
+            document.getElementById('imageViewer').classList.add('hidden');
+            document.getElementById('pdfNavigation').classList.add('hidden');
+            document.getElementById('pdfPageInfo').classList.add('hidden');
+            document.getElementById('fileLoading').classList.add('hidden');
+            document.getElementById('fileError').classList.add('hidden');
+            
+            if (file.type === 'pdf') {
+                // Show loading
+                document.getElementById('fileLoading').classList.remove('hidden');
+                document.getElementById('fileViewerModal').classList.add('active');
+                
+                try {
+                    // Convert base64 to Uint8Array for PDF.js
+                    const pdfData = base64ToUint8Array(file.data);
+                    
+                    // Load PDF using PDF.js
+                    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+                    currentPdf = await loadingTask.promise;
+                    totalPages = currentPdf.numPages;
+                    currentPage = 1;
+                    currentScale = 1.5;
+                    
+                    // Hide loading, show canvas and navigation
+                    document.getElementById('fileLoading').classList.add('hidden');
+                    document.getElementById('pdfCanvas').classList.remove('hidden');
+                    document.getElementById('pdfNavigation').classList.remove('hidden');
+                    document.getElementById('pdfPageInfo').classList.remove('hidden');
+                    
+                    // Render first page
+                    await renderPdfPage(currentPage);
+                    
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                    document.getElementById('fileLoading').classList.add('hidden');
+                    document.getElementById('fileError').classList.remove('hidden');
+                    document.getElementById('fileErrorMessage').textContent = 'Unable to load PDF: ' + error.message;
+                }
+            } else {
+                // For images
+                const imageViewer = document.getElementById('imageViewer');
+                imageViewer.src = file.data;
+                imageViewer.classList.remove('hidden');
+                document.getElementById('fileViewerModal').classList.add('active');
+            }
         }
 
-        function closeFileViewer() { document.getElementById('fileViewerModal').classList.remove('active'); }
+        function closeFileViewer() { 
+            const modal = document.getElementById('fileViewerModal');
+            currentPdf = null;
+            currentPage = 1;
+            totalPages = 0;
+            currentFileData = null;
+            currentFileName = null;
+            currentFileType = null;
+            modal.classList.remove('active'); 
+        }
+
+        function printCurrentFile() {
+            if (!currentFileData) return;
+            
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Please allow pop-ups to print');
+                return;
+            }
+
+            if (currentFileType === 'pdf') {
+                // For PDF, create an iframe and print
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head><title>Print - ${currentFileName}</title></head>
+                    <body style="margin:0;padding:0;">
+                        <embed src="${currentFileData}" type="application/pdf" width="100%" height="100%" style="position:absolute;top:0;left:0;right:0;bottom:0;">
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            } else {
+                // For images
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Print - ${currentFileName}</title>
+                        <style>
+                            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                            img { max-width: 100%; max-height: 100vh; }
+                            @media print { body { margin: 0; } img { max-width: 100%; } }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${currentFileData}" onload="setTimeout(function(){window.print();},200);">
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }
+        }
+
+        function downloadCurrentFile() {
+            if (!currentFileData || !currentFileName) return;
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = currentFileData;
+            link.download = currentFileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
         async function showGallery(dayId) {
             const day = getDays().find(d => d.id === dayId);
@@ -2521,26 +3918,96 @@
             }
         }
 
+        // Auth System
+        const SESSION_KEY = 'travelplan_session';
+        const DEFAULT_PASSWORD = '1234';
+
+        function initAuth() {
+            const session = sessionStorage.getItem(SESSION_KEY);
+            const screen = document.getElementById('authScreen');
+            
+            if (!session) {
+                // Show auth screen
+                screen.style.display = 'flex';
+            } else {
+                // Hide auth screen
+                screen.style.display = 'none';
+            }
+        }
+
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('authPassword').value;
+            const screen = document.getElementById('authScreen');
+            
+            if (password === DEFAULT_PASSWORD) {
+                // Login successful
+                sessionStorage.setItem(SESSION_KEY, 'true');
+                
+                // Hide auth screen immediately using style
+                screen.style.display = 'none';
+                
+                // Clear password field
+                document.getElementById('authPassword').value = '';
+                
+                // Connect to Firebase now that user is authenticated
+                if (!firebaseApp) {
+                    const config = getSavedFirebaseConfig();
+                    initFirebase(config);
+                }
+            } else {
+                // Wrong password
+                alert('Incorrect password. Default is: 1234');
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authPassword').focus();
+                
+                // Shake animation
+                screen.classList.add('shake');
+                setTimeout(() => screen.classList.remove('shake'), 500);
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            location.reload();
+        }
+
         // Initialize
         async function init() {
+            // Check Auth First
+            initAuth();
+
             // Load settings
             const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
             if (settings.darkMode) document.documentElement.classList.add('dark');
 
             // Auto-connect to Firebase with default config
             const config = getSavedFirebaseConfig();
-            showLoading('Connecting to database...');
+            
+            // Only show loading if we are logged in (or setting up)
+            // But visually the auth screen covers it, so it's fine.
             
             try {
-                await initFirebase(config);
+                // Don't block UI with loading if behind auth screen
+                // Only connect if logged in
+                if (sessionStorage.getItem(SESSION_KEY)) {
+                    showLoading('Connecting to database...');
+                    await initFirebase(config);
+                }
             } catch (error) {
                 hideLoading();
-                document.getElementById('firebaseConfigModal').classList.add('active');
+                // Only show config modal if auth passed
+                if (sessionStorage.getItem(SESSION_KEY)) {
+                    document.getElementById('firebaseConfigModal').classList.add('active');
+                }
             }
 
             // Initialize builder
             addActivityInput();
             switchTab('dashboard');
+            
+            // Initialize date pickers
+            initDateInputs();
         }
 
         init();
